@@ -22,21 +22,22 @@ export const createPost = async (req, res) => {
 
     await newPost.save();
 
-    // return all the  post in database to the frontend after creating a new post
-    const post = await Post.find();
-    res.status(201).json(post);
+    // Return all posts after creating a new post
+    const posts = await Post.find();
+    const allPosts = posts.map((post) => post.toObject()); // Convert each post to object
+    res.status(201).json(allPosts);
   } catch (error) {
     console.log(error);
     res.status(404).json({ message: error.message });
   }
 };
-
 /* GET getFeedPosts, getUserPosts, ( here we have to add the get friends post ) */
 
 export const getFeedPosts = async (req, res) => {
   try {
-    const post = await Post.find(); // here return all user post
-    res.status(200).json(post);
+    const posts = await Post.find(); // Return all posts
+    const allPosts = posts.map((post) => post.toObject()); // Convert each post to object
+    res.status(200).json(allPosts);
   } catch (error) {
     console.log(error);
     res.status(404).json({ message: error.message });
@@ -46,8 +47,9 @@ export const getFeedPosts = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const post = await Post.find({ userId }); // here return the particular user post
-    res.status(200).json(post);
+    const posts = await Post.find({ userId }); // Return posts of a particular user
+    const allPosts = posts.map((post) => post.toObject()); // Convert each post to object
+    res.status(200).json(allPosts);
   } catch (error) {
     console.log(error);
     res.status(404).json({ message: error.message });
@@ -59,8 +61,9 @@ export const getFriendsPosts = async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId);
-    const friendsPosts = await Post.find({ userId: { $in: user.friends } });
-    res.status(200).json(friendsPosts);
+    const friendsPosts = await Post.find({ userId: { $in: user.friends } }); // Return posts of friends
+    const allPosts = friendsPosts.map((post) => post.toObject()); // Convert each post to object
+    res.status(200).json(allPosts);
   } catch (error) {
     console.log(error);
     res.status(404).json({ message: error.message });
@@ -72,7 +75,7 @@ export const likePost = async (req, res) => {
   try {
     const { id } = req.params; // id of the post
     const { userId } = req.body; // id of the user who like the post
-    const post = await Post.findById(id); //
+    const post = await Post.findById(id); // find the post by thier id
 
     // here we check if the user already liked the post or not
     const isLiked = post.likes.get(userId);
