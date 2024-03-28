@@ -3,6 +3,7 @@ import {
   getUser,
   getUserFriends,
   addRemoveFriend,
+  feedback,
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -14,5 +15,8 @@ userRoutes.get("/:id/friends", verifyToken, getUserFriends);
 
 /*UPDATE*/
 userRoutes.patch("/:id/:friendId", verifyToken, addRemoveFriend);
+
+/*Feedback*/
+userRoutes.post("/feedback", verifyToken, feedback);
 
 export default userRoutes;

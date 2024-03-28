@@ -10,9 +10,9 @@ import UserImage from "./UserImage";
 const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { _id } = useSelector((state) => state.user); // here we grab the user id to find their friends list
+  const { _id } = useSelector((state) => state.user); // destruct the id from the current login user
   const token = useSelector((state) => state.token);
-  const friends = useSelector((state) => state.user.friends);
+  const friends = useSelector((state) => state.user.friends); // take a look of user schema for better understanding // here we grab the current login user friends list
 
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
@@ -47,7 +47,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
         <Box
           onClick={() => {
             navigate(`/profile/${friendId}`);
-            // we we go to the user friend profile page and then again go to the someone profile page
+            //  we go to the user friend profile page and then again go to the someone profile page
             // then url update with react router but component does not reender so we use navigate(0) to reender the component
             navigate(0);
           }}

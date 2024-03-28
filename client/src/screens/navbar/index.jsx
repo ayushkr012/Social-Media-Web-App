@@ -59,7 +59,7 @@ export default function Navbar() {
             },
           }}
         >
-          Sociopedia
+          Connectify
         </Typography>
         {isNonMobileScreens && (
           <FlexBetween
@@ -87,8 +87,18 @@ export default function Navbar() {
             )}
           </IconButton>
           <Message sx={{ fontSize: "25px" }} />
-          <Notifications sx={{ fontSize: "25px" }} />
-          <Help sx={{ fontSize: "25px" }} />
+          <Notifications
+            sx={{ fontSize: "25px" }}
+            onClick={() => {
+              navigate("/notifications");
+            }}
+          />
+          <Help
+            sx={{ fontSize: "25px" }}
+            onClick={() => {
+              navigate("/feedback");
+            }}
+          />
           <FormControl variant="standard" value={fullName}>
             <Select
               value={fullName}
@@ -110,7 +120,14 @@ export default function Navbar() {
               <MenuItem value={fullName}>
                 <Typography>{fullName}</Typography>
               </MenuItem>
-              <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  dispatch(setLogout());
+                  navigate("/");
+                }}
+              >
+                Log Out
+              </MenuItem>
             </Select>
           </FormControl>
         </FlexBetween>
@@ -162,8 +179,18 @@ export default function Navbar() {
               )}
             </IconButton>
             <Message sx={{ fontSize: "25px" }} />
-            <Notifications sx={{ fontSize: "25px" }} />
-            <Help sx={{ fontSize: "25px" }} />
+            <Notifications
+              sx={{ fontSize: "25px" }}
+              onClick={() => {
+                navigate("/notifications");
+              }}
+            />
+            <Help
+              sx={{ fontSize: "25px" }}
+              onClick={() => {
+                navigate("/feedback");
+              }}
+            />
             <FormControl variant="standard" value={fullName}>
               <Select
                 value={fullName}

@@ -33,6 +33,14 @@ const loginSchema = yup.object().shape({
   password: yup.string().required("required"),
 });
 
+const otpLoginSchema = yup.object().shape({
+  email: yup.string().email("Invalid email").required("Email is required"),
+});
+
+const enterOtpSchema = yup.object().shape({
+  otp: yup.string().required("OTP is required"),
+});
+
 const initialValuesRegister = {
   firstName: "",
   lastName: "",
@@ -48,7 +56,16 @@ const initialValuesLogin = {
   password: "",
 };
 
+const initialValuesOtpLogin = {
+  email: "",
+};
+
+const initialValuesEnterOtp = {
+  otp: "",
+};
+
 const Form = () => {
+  const [userEmail, setUserEmail] = useState("");
   const [pageType, setPageType] = useState("login");
   const { palette } = useTheme();
   const dispatch = useDispatch();
@@ -56,6 +73,65 @@ const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
+  const isOtpLogin = pageType === "otp";
+  const isEnterOtp = pageType == "enterOtp";
+
+  const handleOtpLogin = () => {
+    // when user clink on login with otp set pageType to otp
+    setPageType("otp");
+  };
+
+  const SendOtp = async (values, onSubmitProps) => {
+    const response = await fetch("http://localhost:3001/auth/sendotp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: values.email,
+      }),
+    });
+
+    const json = await response.json();
+    if (json.success) {
+      toast.success(json.message);
+      // after 1.5 second set page type to enterotp
+      setTimeout(() => {
+        setUserEmail(values.email);
+        setPageType("enterOtp");
+      }, 1500);
+    } else {
+      toast.error(json.message);
+    }
+  };
+
+  const enterOtp = async (values, onSubmitProps) => {
+    const response = await fetch("http://localhost:3001/auth/verifyotp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "Application/json",
+      },
+      body: JSON.stringify({
+        email: userEmail,
+        otp: values.otp,
+      }),
+    });
+    const json = await response.json();
+    // onSubmitProps.resetForm();
+    if (json.success) {
+      dispatch(
+        setLogin({
+          // when we have to pass as a payload we use an object and pass the data as a key value pair
+          user: json.user,
+          token: json.token,
+        })
+      );
+      toast.success(json.message);
+      setTimeout(() => navigate("/home"), 1000); // navigate to home after 1 seconds
+    } else {
+      toast.error(json.message);
+    }
+  };
 
   const register = async (values, onSubmitProps) => {
     // this allows us to send form info with image
@@ -63,6 +139,11 @@ const Form = () => {
     for (let value in values) {
       formData.append(value, values[value]);
     }
+
+    if (!values.picture || !values.picture.name.trim()) {
+      return toast.error("Please upload a picture");
+    }
+
     formData.append("picturePath", values.picture.name);
 
     const savedUserResponse = await fetch(
@@ -73,7 +154,7 @@ const Form = () => {
       }
     );
     const json = await savedUserResponse.json();
-    onSubmitProps.resetForm();
+    // onSubmitProps.resetForm();
 
     if (json.success) {
       toast.success(json.message);
@@ -91,7 +172,7 @@ const Form = () => {
       body: JSON.stringify(values),
     });
     const json = await loggedInResponse.json();
-    onSubmitProps.resetForm();
+    // onSubmitProps.resetForm();
     if (json.success) {
       dispatch(
         setLogin({
@@ -110,13 +191,31 @@ const Form = () => {
   const handleFormSubmit = async (values, onSubmitProps) => {
     if (isLogin) await login(values, onSubmitProps);
     if (isRegister) await register(values, onSubmitProps);
+    if (isOtpLogin) await SendOtp(values, onSubmitProps);
+    if (isEnterOtp) await enterOtp(values, onSubmitProps);
   };
 
   return (
     <Formik
       onSubmit={handleFormSubmit}
-      initialValues={isLogin ? initialValuesLogin : initialValuesRegister}
-      validationSchema={isLogin ? loginSchema : registerSchema}
+      initialValues={
+        isLogin
+          ? initialValuesLogin
+          : isOtpLogin
+          ? initialValuesOtpLogin
+          : isEnterOtp
+          ? initialValuesEnterOtp
+          : initialValuesRegister
+      }
+      validationSchema={
+        isLogin
+          ? loginSchema
+          : isOtpLogin
+          ? otpLoginSchema
+          : isEnterOtp
+          ? enterOtpSchema
+          : registerSchema
+      }
     >
       {/*   {()=>()}   */}
       {/*   {(  { here inside we pass the props }  )=>()} */}
@@ -228,27 +327,71 @@ const Form = () => {
               </>
             )}
 
-            <TextField
-              label="Email"
-              onBlur={handleBlur}
-              onChange={handleChange}
-              value={values.email}
-              name="email"
-              error={Boolean(touched.email) && Boolean(errors.email)}
-              helperText={touched.email && errors.email}
-              sx={{ gridColumn: "span 4" }}
-            />
-            <TextField
-              label="Password"
-              type="password"
-              onBlur={handleBlur}
-              onChange={handleChange}
-              value={values.password}
-              name="password"
-              error={Boolean(touched.password) && Boolean(errors.password)}
-              helperText={touched.password && errors.password}
-              sx={{ gridColumn: "span 4" }}
-            />
+            {isLogin && (
+              <>
+                <TextField
+                  label="Email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.email}
+                  name="email"
+                  error={Boolean(touched.email) && Boolean(errors.email)}
+                  helperText={touched.email && errors.email}
+                  sx={{ gridColumn: "span 4" }}
+                />
+                <TextField
+                  label="Password"
+                  type="password"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.password}
+                  name="password"
+                  error={Boolean(touched.password) && Boolean(errors.password)}
+                  helperText={touched.password && errors.password}
+                  sx={{ gridColumn: "span 4" }}
+                />
+              </>
+            )}
+
+            {isOtpLogin && (
+              <>
+                <TextField
+                  label="Email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.email}
+                  name="email"
+                  error={Boolean(touched.email) && Boolean(errors.email)}
+                  helperText={touched.email && errors.email}
+                  sx={{ gridColumn: "span 4", mb: "0vh", mt: "10vh" }}
+                />
+                {/* <TextField
+                  label="OTP"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.otp}
+                  name="otp"
+                  error={Boolean(touched.otp) && Boolean(errors.otp)}
+                  helperText={touched.otp && errors.otp}
+                  sx={{ gridColumn: "span 4" }}
+                /> */}
+              </>
+            )}
+
+            {isEnterOtp && (
+              <>
+                <TextField
+                  label="OTP"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.otp}
+                  name="otp"
+                  error={Boolean(touched.otp) && Boolean(errors.otp)}
+                  helperText={touched.otp && errors.otp}
+                  sx={{ gridColumn: "span 4", mb: "0vh", mt: "10vh" }}
+                />
+              </>
+            )}
           </Box>
 
           {/* BUTTONS */}
@@ -264,27 +407,71 @@ const Form = () => {
                 "&:hover": { color: palette.primary.main },
               }}
             >
-              {isLogin ? "LOGIN" : "REGISTER"}
-            </Button>
-            <Typography
-              onClick={() => {
-                setPageType(isLogin ? "register" : "login");
-                resetForm();
-              }}
-              sx={{
-                textDecoration: "underline",
-                color: palette.primary.main,
-                "&:hover": {
-                  cursor: "pointer",
-                  color: palette.primary.light,
-                },
-              }}
-            >
               {isLogin
-                ? "Don't have an account? Sign Up here."
-                : "Already have an account? Login here."}
-            </Typography>
+                ? "LOGIN"
+                : isOtpLogin || isEnterOtp
+                ? "Submit"
+                : "REGISTER"}
+            </Button>
+            {isLogin ? (
+              <FlexBetween>
+                <Typography
+                  onClick={() => {
+                    setPageType("register");
+                    resetForm();
+                  }}
+                  sx={{
+                    textDecoration: "underline",
+                    color: palette.primary.main,
+                    "&:hover": {
+                      cursor: "pointer",
+                      color: palette.primary.light,
+                    },
+                  }}
+                >
+                  Don't have an account? Sign Up here.
+                </Typography>
+                {isLogin && (
+                  <Button onClick={handleOtpLogin}>Login with OTP</Button>
+                )}
+              </FlexBetween>
+            ) : isOtpLogin || isEnterOtp ? (
+              <Typography
+                onClick={() => {
+                  setPageType("register");
+                  resetForm();
+                }}
+                sx={{
+                  textDecoration: "underline",
+                  color: palette.primary.main,
+                  "&:hover": {
+                    cursor: "pointer",
+                    color: palette.primary.light,
+                  },
+                }}
+              >
+                Don't have an account? Sign Up here.
+              </Typography>
+            ) : (
+              <Typography
+                onClick={() => {
+                  setPageType("login");
+                  resetForm();
+                }}
+                sx={{
+                  textDecoration: "underline",
+                  color: palette.primary.main,
+                  "&:hover": {
+                    cursor: "pointer",
+                    color: palette.primary.light,
+                  },
+                }}
+              >
+                Already have an account? Login here.
+              </Typography>
+            )}
           </Box>
+
           <ToastContainer />
         </form>
       )}

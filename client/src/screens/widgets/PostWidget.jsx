@@ -58,6 +58,7 @@ const PostWidget = ({
 
   return (
     <WidgetWrapper m="2rem 0">
+      {/* create a component for the upper part of description of each post*/}
       <Friend
         friendId={postUserId}
         name={name}

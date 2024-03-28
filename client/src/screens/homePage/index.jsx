@@ -18,7 +18,7 @@ export default function HomePage(){}
 
 const HomePage = () => {
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
-  const { _id, picturePath } = useSelector((state) => state.user);
+  const { _id, picturePath } = useSelector((state) => state.user); // destruct the user id and picture path from user after login
 
   return (
     <Box>
@@ -33,6 +33,7 @@ const HomePage = () => {
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={_id} picturePath={picturePath} />
         </Box>
+
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
@@ -40,6 +41,7 @@ const HomePage = () => {
           <MyPostWidget picturePath={picturePath} />
           <PostsWidget userId={_id} />
         </Box>
+
         {isNonMobileScreens && (
           <Box flexBasis="26%">
             <AdvertWidget />
