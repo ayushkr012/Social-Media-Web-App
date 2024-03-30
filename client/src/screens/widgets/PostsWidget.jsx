@@ -26,7 +26,10 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       `http://localhost:3001/posts/${userId}/posts`,
       {
         method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // "Content-Type": "application/json",
+        },
       }
     );
     const data = await response.json();
@@ -68,6 +71,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
               userPicturePath={userPicturePath}
               likes={likes}
               comments={comments}
+              isProfile={isProfile}
             />
           )
         )}

@@ -23,7 +23,7 @@ export const createPost = async (req, res) => {
     await newPost.save();
 
     // Return all posts after creating a new post
-    const posts = await Post.find();
+    const posts = await Post.find().sort({ _id: -1 });
     const allPosts = posts.map((post) => post.toObject()); // Convert each post to object
     res.status(201).json(allPosts);
   } catch (error) {
@@ -35,7 +35,8 @@ export const createPost = async (req, res) => {
 
 export const getFeedPosts = async (req, res) => {
   try {
-    const posts = await Post.find(); // Return all posts
+    // const posts = await Post.find(); // Return all posts
+    const posts = await Post.find().sort({ _id: -1 });
     const allPosts = posts.map((post) => post.toObject()); // Convert each post to object
     res.status(200).json(allPosts);
   } catch (error) {
@@ -47,7 +48,7 @@ export const getFeedPosts = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const posts = await Post.find({ userId }); // Return posts of a particular user
+    const posts = await Post.find({ userId }).sort({ _id: -1 }); // Return posts of a particular user
     const allPosts = posts.map((post) => post.toObject()); // Convert each post to object
     res.status(200).json(allPosts);
   } catch (error) {
@@ -99,5 +100,30 @@ export const likePost = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(404).json({ message: error.message });
+  }
+};
+
+/* DELETE POST */
+
+export const deletePost = async (req, res) => {
+  try {
+    const { PostId, userId } = req.params;
+    const { isProfile } = req.query; // isProfile is a query parameter that indicates whether the user is on their profile page or not
+
+    console.log(PostId, isProfile);
+    await Post.findByIdAndDelete(PostId);
+
+    let posts;
+    if (isProfile === "true") {
+      posts = await Post.find({ userId }).sort({ _id: -1 });
+    } else {
+      posts = await Post.find().sort({ _id: -1 });
+    }
+    const allPosts = posts.map((post) => post.toObject());
+
+    res.status(200).json(allPosts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error!" });
   }
 };

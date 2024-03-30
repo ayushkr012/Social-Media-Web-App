@@ -2,6 +2,7 @@ import { Box, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import Navbar from "screens/navbar";
 import FriendListWidget from "screens/widgets/FriendListWidget";
 import PostsWidget from "screens/widgets/PostsWidget";
@@ -48,11 +49,11 @@ const ProfilePage = () => {
           flexBasis={isNonMobileScreens ? "22%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          {/* <MyPostWidget picturePath={user.picturePath} /> */}
           <FriendListWidget userId={userId} />
           <Box m="2rem 0" />
         </Box>
       </Box>
+      <ToastContainer />
     </Box>
   );
 };

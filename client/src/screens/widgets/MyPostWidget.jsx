@@ -24,6 +24,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
+import { ToastContainer, toast } from "react-toastify";
 
 // props data came from homePage/index.jsx
 const MyPostWidget = ({ picturePath }) => {
@@ -53,10 +54,17 @@ const MyPostWidget = ({ picturePath }) => {
       body: formData,
     });
     const posts = await response.json();
+
+    toast.success("Post created successfully", { autoClose: 1000 });
+    // setTimeout(() => {
     dispatch(setPosts({ posts }));
+    // }, 300);
+
     // after the api call we reset the state
+    // setTimeout(() => {
     setImage(null);
     setPost("");
+    // }, 300);
   };
 
   return (
@@ -119,9 +127,7 @@ const MyPostWidget = ({ picturePath }) => {
           </Dropzone>
         </Box>
       )}
-
       <Divider sx={{ margin: "1.25rem 0" }} />
-
       <FlexBetween>
         <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
           <ImageOutlined sx={{ color: mediumMain }} />
@@ -169,6 +175,9 @@ const MyPostWidget = ({ picturePath }) => {
           POST
         </Button>
       </FlexBetween>
+      {/* we direct can't use ToastContainer here it gives toggle error beacuse all these part are came from home 
+      page so we use toast conatiner homepage only and here we set all the success and error message of taost  */}
+      {/* <ToastContainer /> */}{" "}
     </WidgetWrapper>
   );
 };

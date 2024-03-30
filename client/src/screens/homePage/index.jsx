@@ -7,6 +7,7 @@ import MyPostWidget from "screens/widgets/MyPostWidget";
 import PostsWidget from "screens/widgets/PostsWidget";
 import AdvertWidget from "screens/widgets/AdvertWidget";
 import FriendListWidget from "screens/widgets/FriendListWidget";
+import { ToastContainer } from "react-toastify";
 /* we can also do this way 
 const HomePage=()=>{};
 export default HomePage;
@@ -50,6 +51,7 @@ const HomePage = () => {
           </Box>
         )}
       </Box>
+      <ToastContainer />
     </Box>
   );
 };

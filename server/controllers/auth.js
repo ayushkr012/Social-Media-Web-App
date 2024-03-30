@@ -352,21 +352,21 @@ export const verifyOtp = async (req, res) => {
       });
     }
 
-    const otpVerification = await UserOtp.findOne({ email });
-
-    if (!otpVerification || otpVerification.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid OTP",
-      });
-    }
-
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({
         success: false,
         message: "User not found",
+      });
+    }
+
+    const otpVerification = await UserOtp.findOne({ email });
+
+    if (!otpVerification || otpVerification.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
       });
     }
 
