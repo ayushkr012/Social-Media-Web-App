@@ -86,7 +86,12 @@ export default function Navbar() {
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton>
-          <Message sx={{ fontSize: "25px" }} />
+          <Message
+            sx={{ fontSize: "25px" }}
+            onClick={() => {
+              navigate("/message");
+            }}
+          />
           <Notifications
             sx={{ fontSize: "25px" }}
             onClick={() => {
@@ -178,7 +183,12 @@ export default function Navbar() {
                 <LightMode sx={{ color: dark, fontSize: "25px" }} />
               )}
             </IconButton>
-            <Message sx={{ fontSize: "25px" }} />
+            <Message
+              sx={{ fontSize: "25px" }}
+              onClick={() => {
+                navigate("/message");
+              }}
+            />
             <Notifications
               sx={{ fontSize: "25px" }}
               onClick={() => {

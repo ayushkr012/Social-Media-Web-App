@@ -5,6 +5,7 @@ const initialState = {
   user: null,
   token: null,
   posts: [],
+  chatFriend: null, // New state to hold the selected chat friend
 };
 
 export const authSlice = createSlice({
@@ -40,9 +41,20 @@ export const authSlice = createSlice({
       });
       state.posts = updatedPosts;
     },
+    setChatFriend: (state, action) => {
+      // New reducer to set the chat friend
+      state.chatFriend = action.payload;
+    },
   },
 });
 
-export const { setMode, setLogin, setLogout, setFriends, setPosts, setPost } =
-  authSlice.actions;
+export const {
+  setMode,
+  setLogin,
+  setLogout,
+  setFriends,
+  setPosts,
+  setPost,
+  setChatFriend,
+} = authSlice.actions;
 export default authSlice.reducer;
