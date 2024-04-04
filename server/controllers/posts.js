@@ -75,7 +75,7 @@ export const getFriendsPosts = async (req, res) => {
 export const likePost = async (req, res) => {
   try {
     const { id } = req.params; // id of the post
-    const { userId } = req.body; // id of the user who like the post
+    const { userId, postUserId } = req.body; // userId is the id of the user who like the post and postUserId is the id of the user who created the post
     const post = await Post.findById(id); // find the post by thier id
 
     // here we check if the user already liked the post or not
@@ -96,7 +96,69 @@ export const likePost = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json(updatedPost);
+    //  -------------------------------------> User NOTIFICATION PART ------------------------------<
+
+    const user = await User.findById(userId);
+    const postUser = await User.findById(postUserId);
+
+    // user not get notified when they like their own post
+    if (user != postUser) {
+      postUser.notifications.push({
+        message: "liked your post.",
+        userId: user._id, // Use the _id of the user who liked the post
+      });
+    }
+
+    await postUser.save();
+
+    // Retrieve the updated notifications for the user
+    const userNotifications = await Promise.all(
+      user.notifications.map(async (notification) => {
+        return {
+          userId: notification.userId,
+          message: notification.message,
+        };
+      })
+    );
+
+    // Merge user details with notifications and include message
+    const formattedNotifications = await Promise.all(
+      userNotifications.map(async (notification) => {
+        const { userId, message } = notification;
+
+        try {
+          const userDetails = await User.findById(userId);
+          if (userDetails) {
+            return {
+              userId,
+              firstName: userDetails.firstName,
+              lastName: userDetails.lastName,
+              occupation: userDetails.occupation,
+              location: userDetails.location,
+              picturePath: userDetails.picturePath,
+              message,
+            };
+          } else {
+            return null; // Return null if user details are not found (optional)
+          }
+        } catch (error) {
+          console.error("Error fetching user details:", error);
+          return null;
+        }
+      })
+    );
+
+    // Filter out null values if any
+    const filteredNotifications = formattedNotifications.filter(
+      (notification) => notification !== null
+    );
+
+    console.log("filteredNotifications", filteredNotifications);
+
+    res.status(200).json({
+      updatedPost: updatedPost,
+      updatedNotifications: filteredNotifications,
+    });
   } catch (error) {
     console.log(error);
     res.status(404).json({ message: error.message });

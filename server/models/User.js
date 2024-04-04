@@ -1,5 +1,17 @@
 import mongoose from "mongoose";
 
+const notificationSchema = new mongoose.Schema({
+  message: {
+    type: String,
+    required: true
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId, // Assuming userId refers to the ObjectId of the user
+    required: true
+  }
+}, { _id: false }); // You may not need _id for notification objects
+
+
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -31,6 +43,10 @@ const userSchema = new mongoose.Schema(
     },
     friends: {
       type: Array,
+      default: [],
+    },
+    notifications: {
+      type: [notificationSchema], // Array of notification objects
       default: [],
     },
     location: {

@@ -3,12 +3,11 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Navbar from "screens/navbar";
 import WidgetWrapper from "components/WidgetWrapper";
-import FriendListWidget from "screens/widgets/FriendListWidget";
-import PostsWidget from "screens/widgets/PostsWidget";
-import UserWidget from "screens/widgets/UserWidget";
+import NotificationWidget from "screens/widgets/NotificationWidget";
+import FlexBtweeen from "components/FlexBetween";
 
 const Notification = () => {
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user); // destruct the userId from the user object
   const token = useSelector((state) => state.token);
@@ -82,17 +81,42 @@ const Notification = () => {
         </WidgetWrapper>
 
         {/* middle part of notification */}
-        <Box flexBasis={isNonMobileScreens ? "60%" : undefined}>
-          {/* <UserWidget userId={userId} picturePath={user.picturePath} /> */}
+        <Box
+          flexBasis={isNonMobileScreens ? "60%" : undefined}
+          mt={isNonMobileScreens ? undefined : "1rem"}
+        >
+          <WidgetWrapper>
+            <FlexBtweeen>
+              <FlexBtweeen>
+                <Box ml="1rem">
+                  {" "}
+                  <Typography>All</Typography>
+                </Box>
+                <Box ml="1rem">
+                  {" "}
+                  <Typography>Unread</Typography>
+                </Box>
+                <Box ml="1rem">
+                  {" "}
+                  <Typography>My Posts</Typography>
+                </Box>
+                <Box ml="1rem">
+                  <Typography>Mentions</Typography>
+                </Box>
+              </FlexBtweeen>
+            </FlexBtweeen>
+          </WidgetWrapper>
+
+          <Box m="1rem 0" />
+          <NotificationWidget userId={_id} />
           <Box m="2rem 0" />
-          {/* <PostsWidget userId={userId} isProfile /> */}
         </Box>
 
         <Box
           flexBasis={isNonMobileScreens ? "22%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          <FriendListWidget userId={_id} />
+          {/* <NotificationWidget userId={_id} /> */}
           <Box m="2rem 0" />
         </Box>
       </Box>

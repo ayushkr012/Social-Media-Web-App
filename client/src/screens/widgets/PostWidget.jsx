@@ -33,7 +33,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
-import { setPosts } from "state";
+import { setPosts, setNotifications } from "state";
 import { toast } from "react-toastify";
 
 const PostWidget = ({
@@ -68,6 +68,7 @@ const PostWidget = ({
 
   const isOwnPost = loggedInUserId === postUserId;
 
+  // like and unlike the post and send the request to the server for the notification part
   const patchLike = async () => {
     try {
       const response = await fetch(
@@ -78,11 +79,23 @@ const PostWidget = ({
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userId: loggedInUserId }),
+          body: JSON.stringify({
+            userId: loggedInUserId,
+            postUserId: postUserId,
+          }),
         }
       );
-      const updatedPost = await response.json();
-      dispatch(setPost({ post: updatedPost }));
+      const data = await response.json();
+
+      // console.log("Data received from server:", data); // Log the data received from the server
+
+      // Dispatch the setNotifications action to update the notifications
+      dispatch(setNotifications({ notifications: data.updatedNotifications }));
+
+      // Dispatch the setPost action to update the liked post
+      dispatch(setPost({ post: data.updatedPost }));
+
+      console.log(data.updatedNotifications);
     } catch (error) {
       console.error("Error liking post:", error);
     }

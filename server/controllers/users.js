@@ -65,7 +65,7 @@ export const addRemoveFriend = async (req, res) => {
     await user.save();
     await friend.save();
 
-    // after saving we return the updated friends list of the user
+    // Retrieve the updated friendList for the user
     const friends = await Promise.all(
       user.friends.map((id) => User.findById(id))
     );

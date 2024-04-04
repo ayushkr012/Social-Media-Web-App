@@ -5,7 +5,8 @@ const initialState = {
   user: null,
   token: null,
   posts: [],
-  chatFriend: null, // New state to hold the selected chat friend
+  chatFriend: null, // state to hold the selected chat friend
+  notifications: [], // state to hold notification
 };
 
 export const authSlice = createSlice({
@@ -41,9 +42,13 @@ export const authSlice = createSlice({
       });
       state.posts = updatedPosts;
     },
+    //  to set the chat friend
     setChatFriend: (state, action) => {
-      // New reducer to set the chat friend
       state.chatFriend = action.payload;
+    },
+    // to set notifications
+    setNotifications: (state, action) => {
+      state.notifications = action.payload.notifications;
     },
   },
 });
@@ -56,5 +61,6 @@ export const {
   setPosts,
   setPost,
   setChatFriend,
+  setNotifications,
 } = authSlice.actions;
 export default authSlice.reducer;
