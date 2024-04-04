@@ -36,7 +36,7 @@ const NotificationList = ({
     <FlexBetween
       sx={{
         "&:hover": {
-          backgroundColorcolor: palette.primary.dark,
+          backgroundColor: "#EBEBEB",
           cursor: "pointer",
         },
       }}
@@ -44,7 +44,7 @@ const NotificationList = ({
       <FlexBetween gap="1rem" onClick={handleClick}>
         <UserImage image={userPicturePath} size="55px" />
         <Box>
-          <Typography color={main} variant="h6" fontWeight="300">
+          <Typography sx={{ color: mediumMain }} variant="h6" fontWeight="450">
             {name}
           </Typography>
         </Box>

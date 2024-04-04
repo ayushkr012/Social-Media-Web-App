@@ -30,7 +30,7 @@ const NotificationWidget = ({ userId }) => {
 
   return (
     <WidgetWrapper>
-      <Box display="flex" flexDirection="column" gap="1.5rem">
+      <Box display="flex" flexDirection="column" gap="2rem">
         {Array.isArray(notifications) &&
           notifications.map((user) => (
             <NotificationList

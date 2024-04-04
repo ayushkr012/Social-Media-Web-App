@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import Navbar from "screens/navbar";
 import WidgetWrapper from "components/WidgetWrapper";
 import NotificationWidget from "screens/widgets/NotificationWidget";
-import FlexBtweeen from "components/FlexBetween";
+import FlexBetween from "components/FlexBetween";
 
 const Notification = () => {
   // const [user, setUser] = useState(null);
@@ -12,6 +12,7 @@ const Notification = () => {
   const { _id } = useSelector((state) => state.user); // destruct the userId from the user object
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
+  const [activeMenuItem, setActiveMenuItem] = useState("All");
 
   //   const getNotification = async () => {
   //     const response = await fetch(`http://localhost:3001/users/${_id}`, {
@@ -27,6 +28,45 @@ const Notification = () => {
   //   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   //   if (!user) return null;
+
+  //  {
+  //    theme.palette.mode === "dark" ? (
+  //      <DarkMode sx={{ fontSize: "25px" }} />
+  //    ) : (
+  //      <LightMode sx={{ color: dark, fontSize: "25px" }} />
+  //    );
+  //  }
+
+  const BoxStyle = {
+    padding: "0.8rem",
+    borderRadius: "1rem",
+    border: "1px solid",
+    transition: "background-color 0.3s ease",
+  };
+
+  const BoxHoverStyle = {
+    ...BoxStyle,
+    "&:hover": {
+      backgroundColor: "lightgray", // Change to appropriate color for light mode
+      cursor: "pointer",
+      color: "black",
+    },
+  };
+
+  const BoxActiveStyle = {
+    ...BoxStyle,
+    backgroundColor: "darkgreen", // Change to appropriate color for active state
+    color: "white",
+  };
+  const MenuItem = ({ text, isActive, onClick }) => {
+    const boxStyle = isActive ? BoxActiveStyle : BoxHoverStyle;
+
+    return (
+      <Box sx={boxStyle} onClick={onClick} ml="1rem">
+        <Typography fontWeight="500">{text}</Typography>
+      </Box>
+    );
+  };
 
   return (
     <Box>
@@ -86,25 +126,30 @@ const Notification = () => {
           mt={isNonMobileScreens ? undefined : "1rem"}
         >
           <WidgetWrapper>
-            <FlexBtweeen>
-              <FlexBtweeen>
-                <Box ml="1rem">
-                  {" "}
-                  <Typography>All</Typography>
-                </Box>
-                <Box ml="1rem">
-                  {" "}
-                  <Typography>Unread</Typography>
-                </Box>
-                <Box ml="1rem">
-                  {" "}
-                  <Typography>My Posts</Typography>
-                </Box>
-                <Box ml="1rem">
-                  <Typography>Mentions</Typography>
-                </Box>
-              </FlexBtweeen>
-            </FlexBtweeen>
+            <FlexBetween>
+              <FlexBetween>
+                <MenuItem
+                  text="All"
+                  isActive={activeMenuItem === "All"}
+                  onClick={() => setActiveMenuItem("All")}
+                />
+                <MenuItem
+                  text="Unread"
+                  isActive={activeMenuItem === "Unread"}
+                  onClick={() => setActiveMenuItem("Unread")}
+                />
+                <MenuItem
+                  text="My Posts"
+                  isActive={activeMenuItem === "My Posts"}
+                  onClick={() => setActiveMenuItem("My Posts")}
+                />
+                <MenuItem
+                  text="Mentions"
+                  isActive={activeMenuItem === "Mentions"}
+                  onClick={() => setActiveMenuItem("Mentions")}
+                />
+              </FlexBetween>
+            </FlexBetween>
           </WidgetWrapper>
 
           <Box m="1rem 0" />
