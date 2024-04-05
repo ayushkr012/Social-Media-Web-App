@@ -1,4 +1,4 @@
-import { Box, useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -13,6 +13,7 @@ const ProfilePage = () => {
   const { userId } = useParams(); // grab the userId from the url
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
+  const { palette } = useTheme();
 
   const getUser = async () => {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
@@ -38,6 +39,12 @@ const ProfilePage = () => {
         display={isNonMobileScreens ? "flex" : "block"}
         gap="2rem"
         justifyContent="center"
+        sx={{
+          maxHeight: "100vh", //"calc(100vh - 200px)", // Adjust the max height as per your design
+          overflowY: "auto", // Add vertical scrollbar
+          scrollbarWidth: "0px", // Set scrollbar width thin bold strong
+          scrollbarColor: `${palette.primary.main} ${palette.background.default}`, // Set scrollbar color
+        }}
       >
         <Box flexBasis={isNonMobileScreens ? "60%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />

@@ -102,11 +102,11 @@ export const feedback = async (req, res) => {
       },
     });
 
-const mailOptions = {
-  from: process.env.EMAIL,
-  to: email,
-  subject: `Thank You for Your Feedback on Connectify`,
-  html: `
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: `Thank You for Your Feedback on Connectify`,
+      html: `
     <html>
       <head>
         <style>
@@ -169,7 +169,7 @@ const mailOptions = {
       </body>
     </html>
   `,
-};
+    };
 
     const existingFeedback = await UserFeedBack.findOne({ email });
 
@@ -205,5 +205,127 @@ const mailOptions = {
       success: false,
       message: "Internal Server Error",
     });
+  }
+};
+
+/* Notification  when user view profile Profile View */
+
+export const profileView = async (req, res) => {
+  try {
+    const { userId, postUserId } = req.params;
+    const user = await User.findById(userId);
+    const postUser = await User.findById(postUserId);
+
+    // user not get notified when they view their own profile
+    if (userId != postUserId) {
+      postUser.notifications.push({
+        message: "viewed your profile. See all views",
+        userId: user._id,
+      });
+    }
+
+    await postUser.save();
+
+    // Retrieve the updated notifications for the user
+    const userNotifications = await Promise.all(
+      user.notifications.map(async (notification) => {
+        return {
+          userId: notification.userId,
+          message: notification.message,
+        };
+      })
+    );
+
+    // Merge user details with notifications and include message
+    const formattedNotifications = await Promise.all(
+      userNotifications.map(async (notification) => {
+        const { userId, message } = notification;
+
+        try {
+          const userDetails = await User.findById(userId);
+          if (userDetails) {
+            return {
+              userId,
+              firstName: userDetails.firstName,
+              lastName: userDetails.lastName,
+              occupation: userDetails.occupation,
+              location: userDetails.location,
+              picturePath: userDetails.picturePath,
+              message,
+            };
+          } else {
+            return null; // Return null if user details are not found (optional)
+          }
+        } catch (error) {
+          console.error("Error fetching user details:", error);
+          return null;
+        }
+      })
+    );
+
+    // Filter out null values if any
+    const filteredNotifications = formattedNotifications.filter(
+      (notification) => notification !== null
+    );
+
+    res.status(200).json({ updatedNotifications: filteredNotifications });
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({ message: err.message });
+  }
+};
+
+/* Get Notification */
+export const getNotification = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    // Retrieve the updated notifications for the user
+    const userNotifications = await Promise.all(
+      user.notifications.map(async (notification) => {
+        return {
+          userId: notification.userId,
+          message: notification.message,
+        };
+      })
+    );
+
+    // Merge user details with notifications and include message
+    const formattedNotifications = await Promise.all(
+      userNotifications.map(async (notification) => {
+        const { userId, message } = notification;
+
+        try {
+          const userDetails = await User.findById(userId);
+          if (userDetails) {
+            return {
+              userId,
+              firstName: userDetails.firstName,
+              lastName: userDetails.lastName,
+              occupation: userDetails.occupation,
+              location: userDetails.location,
+              picturePath: userDetails.picturePath,
+              message,
+            };
+          } else {
+            return null; // Return null if user details are not found (optional)
+          }
+        } catch (error) {
+          console.error("Error fetching user details:", error);
+          return null;
+        }
+      })
+    );
+
+    // Filter out null values if any
+    const filteredNotifications = formattedNotifications.filter(
+      (notification) => notification !== null
+    );
+
+    res.status(200).json({ updatedNotifications: filteredNotifications });
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({ message: err.message });
   }
 };

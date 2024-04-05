@@ -7,6 +7,7 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFriends } from "state";
+import { setNotifications } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
@@ -44,18 +45,21 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
     dispatch(setFriends({ friends: data }));
   };
 
-  // for the user to navigate to the  profile page and for the notification part we send a request to the server
+  //  no navigate to the user friend profile page
+  // and send the data to the server to update the notification so user get notified when someone view their profile
   const handleClick = async () => {
-    // const response = await fetch(
-    //   `http://localhost:3001/users/users/profileview/${_id}/${friendId}`,
-    //   {
-    //     method: "GET",
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   }
-    // );
-    // const data = await response.json();
+    const response = await fetch(
+      `http://localhost:3001/users/profileview/${_id}/${friendId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await response.json();
+    // console.log(notifications);
+    dispatch(setNotifications({ notifications: data.updatedNotifications }));
 
     navigate(`/profile/${friendId}`);
     //  we go to the user friend profile page and then again go to the someone profile page

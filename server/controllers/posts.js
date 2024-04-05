@@ -102,7 +102,7 @@ export const likePost = async (req, res) => {
     const postUser = await User.findById(postUserId);
 
     // user not get notified when they like their own post
-    if (user != postUser) {
+    if (userId != postUserId) {
       postUser.notifications.push({
         message: "liked your post.",
         userId: user._id, // Use the _id of the user who liked the post

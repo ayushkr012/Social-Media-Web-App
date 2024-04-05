@@ -2,39 +2,31 @@ import { Box, Typography, useTheme } from "@mui/material";
 import NotificationList from "components/NotificationList";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setNotifications } from "state";
+import { useSelector } from "react-redux";
 
 // props data came from screens/notification/index.jsx
 const NotificationWidget = ({ userId }) => {
-  const dispatch = useDispatch();
   const { palette } = useTheme();
-  const token = useSelector((state) => state.token);
   const notifications = useSelector((state) => state.notifications);
-
-  //   const getFriends = async () => {
-  //     const response = await fetch(
-  //       `http://localhost:3001/users/${userId}/friends`,
-  //       {
-  //         method: "GET",
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-  //     const data = await response.json();
-  //     dispatch(setFriends({ friends: data }));
-  //   };
-
-  //   useEffect(() => {
-  //     getFriends();
-  //   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  console.log(notifications);
 
   return (
-    <WidgetWrapper>
+    <WidgetWrapper
+      sx={
+        // isNonMobileScreens && {
+        {
+          maxHeight: "100vh", //"calc(100vh - 200px)", // Adjust the max height as per your design
+          overflowY: "auto", // Add vertical scrollbar
+          scrollbarWidth: "thin", // Set scrollbar width thin bold strong
+          scrollbarColor: `${palette.primary.main} ${palette.background.default}`, // Set scrollbar color
+        }
+      }
+    >
       <Box display="flex" flexDirection="column" gap="2rem">
         {Array.isArray(notifications) &&
           notifications.map((user) => (
             <NotificationList
-              key={user.userId}
+              // key={user.userId}
               friendId={user.userId}
               name={`${user.firstName} ${user.lastName}`}
               subtitle={user.occupation}
@@ -42,9 +34,14 @@ const NotificationWidget = ({ userId }) => {
               message={user.message}
             />
           ))}
-        {notifications.length === 0 && (
-          <Typography color={palette.neutral.medium}>
-            It looks like you haven't any notifications yet.
+        {(!notifications || notifications.length === 0) && (
+          <Typography
+            color={palette.neutral.medium}
+            sx={{ textAlign: "center" }}
+            fontSize="500"
+            fontWeight={500}
+          >
+            It looks like you haven't any Notifications yet.
           </Typography>
         )}
       </Box>

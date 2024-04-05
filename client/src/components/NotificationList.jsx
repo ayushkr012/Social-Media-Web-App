@@ -16,7 +16,7 @@ const NotificationList = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state) => state.token);
-
+  const theme = useTheme();
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
   const primaryDark = palette.primary.dark;
@@ -36,7 +36,7 @@ const NotificationList = ({
     <FlexBetween
       sx={{
         "&:hover": {
-          backgroundColor: "#EBEBEB",
+          backgroundColor: theme.palette.mode == "dark" ? "white" : "#EBEBEA",
           cursor: "pointer",
         },
       }}

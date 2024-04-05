@@ -5,37 +5,35 @@ import Navbar from "screens/navbar";
 import WidgetWrapper from "components/WidgetWrapper";
 import NotificationWidget from "screens/widgets/NotificationWidget";
 import FlexBetween from "components/FlexBetween";
-
+import { setNotifications, updateNotificationsCount } from "state";
+import { useDispatch } from "react-redux";
 const Notification = () => {
-  // const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user); // destruct the userId from the user object
-  const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const [activeMenuItem, setActiveMenuItem] = useState("All");
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.token);
 
-  //   const getNotification = async () => {
-  //     const response = await fetch(`http://localhost:3001/users/${_id}`, {
-  //       method: "GET",
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //     const data = await response.json();
-  //     setUser(data);
-  //   };
+  /* once i viwed the notification then set the notification count to 0 */
+  dispatch(updateNotificationsCount(0));
 
-  //   useEffect(() => {
-  //     getNotification();
-  //   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const getNotification = async () => {
+    const response = await fetch(
+      `http://localhost:3001/users/notification/${_id}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await response.json();
+    // console.log(notifications);
+    dispatch(setNotifications({ notifications: data.updatedNotifications }));
+  };
 
-  //   if (!user) return null;
-
-  //  {
-  //    theme.palette.mode === "dark" ? (
-  //      <DarkMode sx={{ fontSize: "25px" }} />
-  //    ) : (
-  //      <LightMode sx={{ color: dark, fontSize: "25px" }} />
-  //    );
-  //  }
+  useEffect(() => {
+    getNotification();
+  }, []);
 
   const BoxStyle = {
     padding: "0.8rem",
@@ -81,14 +79,14 @@ const Notification = () => {
         {/* left part of notification */}
         <WidgetWrapper
           flexBasis={isNonMobileScreens ? "25%" : undefined}
-          style={{ height: "18vh" }}
+          style={{ height: isNonMobileScreens ? "18vh" : "10vh" }}
         >
           <Box
             display={
               isNonMobileScreens
                 ? "block"
                 : {
-                    display: "flex",
+                    display: "block",
                     justifyContent: "space-between",
                     alignItems: "center",
                   }
@@ -103,19 +101,21 @@ const Notification = () => {
                 variant="h5"
                 fontWeight="430"
               >
-                Manage your
-              </Typography>
-              <Typography
-                color={palette.neutral.dark}
-                variant="h5"
-                fontWeight="430"
-                ml={isNonMobileScreens ? undefined : "0.3rem"}
-              >
-                Notifications
+                Manage your Notifications
               </Typography>
             </Box>
             <Box mt={isNonMobileScreens ? "0.7rem" : undefined}>
-              <Typography color="primary">View Settings</Typography>
+              <Typography
+                color="primary"
+                sx={{
+                  "&:hover": {
+                    textDecoration: "underline",
+                  },
+                  cursor: "pointer",
+                }}
+              >
+                View Settings
+              </Typography>
             </Box>
           </Box>
         </WidgetWrapper>
@@ -125,9 +125,39 @@ const Notification = () => {
           flexBasis={isNonMobileScreens ? "60%" : undefined}
           mt={isNonMobileScreens ? undefined : "1rem"}
         >
-          <WidgetWrapper>
-            <FlexBetween>
+          {isNonMobileScreens ? (
+            // when the screen is not mobile
+            <WidgetWrapper>
               <FlexBetween>
+                <FlexBetween>
+                  <MenuItem
+                    text="All"
+                    isActive={activeMenuItem === "All"}
+                    onClick={() => setActiveMenuItem("All")}
+                  />
+                  <MenuItem
+                    text="Unread"
+                    isActive={activeMenuItem === "Unread"}
+                    onClick={() => setActiveMenuItem("Unread")}
+                  />
+                  <MenuItem
+                    text="My Posts"
+                    isActive={activeMenuItem === "My Posts"}
+                    onClick={() => setActiveMenuItem("My Posts")}
+                  />
+                  <MenuItem
+                    text="Mentions"
+                    isActive={activeMenuItem === "Mentions"}
+                    onClick={() => setActiveMenuItem("Mentions")}
+                  />
+                </FlexBetween>
+              </FlexBetween>
+            </WidgetWrapper>
+          ) : (
+            // when the screen is mobile
+            <WidgetWrapper>
+              <FlexBetween sx={{ flexWrap: "wrap" }}>
+                {/* <FlexBetween> */}
                 <MenuItem
                   text="All"
                   isActive={activeMenuItem === "All"}
@@ -148,9 +178,10 @@ const Notification = () => {
                   isActive={activeMenuItem === "Mentions"}
                   onClick={() => setActiveMenuItem("Mentions")}
                 />
+                {/* </FlexBetween> */}
               </FlexBetween>
-            </FlexBetween>
-          </WidgetWrapper>
+            </WidgetWrapper>
+          )}
 
           <Box m="1rem 0" />
           <NotificationWidget userId={_id} />

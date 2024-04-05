@@ -4,6 +4,8 @@ import {
   getUserFriends,
   addRemoveFriend,
   feedback,
+  profileView,
+  getNotification,
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -15,6 +17,10 @@ userRoutes.get("/:id/friends", verifyToken, getUserFriends);
 
 /*UPDATE*/
 userRoutes.patch("/:id/:friendId", verifyToken, addRemoveFriend);
+
+/* Notification Profile View */
+userRoutes.get("/profileview/:userId/:postUserId", profileView);
+userRoutes.get("/notification/:userId", getNotification);
 
 /*Feedback*/
 userRoutes.post("/feedback", verifyToken, feedback);

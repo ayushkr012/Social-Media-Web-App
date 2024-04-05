@@ -1,5 +1,4 @@
 import express from "express";
-dotenv.config();
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -19,6 +18,7 @@ import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
+dotenv.config();
 const app = express();
 
 /* CONFIGURATION  when we use type=module */

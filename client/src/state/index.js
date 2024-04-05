@@ -7,6 +7,7 @@ const initialState = {
   posts: [],
   chatFriend: null, // state to hold the selected chat friend
   notifications: [], // state to hold notification
+  notificationsCount: 0, // state to hold the count of notifications
 };
 
 export const authSlice = createSlice({
@@ -49,6 +50,12 @@ export const authSlice = createSlice({
     // to set notifications
     setNotifications: (state, action) => {
       state.notifications = action.payload.notifications;
+      state.notificationsCount =
+        action.payload.notifications.length - state.notificationsCount;
+    },
+    // to update the notifications Count
+    updateNotificationsCount: (state, action) => {
+      state.notificationsCount = action.payload;
     },
   },
 });
@@ -62,5 +69,6 @@ export const {
   setPost,
   setChatFriend,
   setNotifications,
+  updateNotificationsCount,
 } = authSlice.actions;
 export default authSlice.reducer;

@@ -7,6 +7,7 @@ import {
   Select,
   MenuItem,
   FormControl,
+  Badge,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
@@ -32,6 +33,8 @@ export default function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  const notificationlength = useSelector((state) => state.notificationsCount);
+
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   const theme = useTheme();
@@ -86,24 +89,34 @@ export default function Navbar() {
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton>
-          <Message
-            sx={{ fontSize: "25px" }}
-            onClick={() => {
-              navigate("/message");
-            }}
-          />
-          <Notifications
-            sx={{ fontSize: "25px" }}
-            onClick={() => {
-              navigate("/notifications");
-            }}
-          />
-          <Help
-            sx={{ fontSize: "25px" }}
-            onClick={() => {
-              navigate("/feedback");
-            }}
-          />
+          <IconButton>
+            <Message
+              sx={{ fontSize: "25px" }}
+              onClick={() => {
+                navigate("/message");
+              }}
+            />
+          </IconButton>
+
+          <IconButton onClick={() => navigate("/notifications")}>
+            {notificationlength > 0 && (
+              <Badge badgeContent={notificationlength} color="error">
+                <Notifications sx={{ fontSize: "25px" }} />
+              </Badge>
+            )}
+            {notificationlength === 0 && (
+              <Notifications sx={{ fontSize: "25px" }} />
+            )}
+          </IconButton>
+          <IconButton>
+            <Help
+              sx={{ fontSize: "25px" }}
+              onClick={() => {
+                navigate("/feedback");
+              }}
+            />
+          </IconButton>
+
           <FormControl variant="standard" value={fullName}>
             <Select
               value={fullName}
@@ -183,24 +196,35 @@ export default function Navbar() {
                 <LightMode sx={{ color: dark, fontSize: "25px" }} />
               )}
             </IconButton>
-            <Message
-              sx={{ fontSize: "25px" }}
-              onClick={() => {
-                navigate("/message");
-              }}
-            />
-            <Notifications
-              sx={{ fontSize: "25px" }}
-              onClick={() => {
-                navigate("/notifications");
-              }}
-            />
-            <Help
-              sx={{ fontSize: "25px" }}
-              onClick={() => {
-                navigate("/feedback");
-              }}
-            />
+            <IconButton>
+              <Message
+                sx={{ fontSize: "25px" }}
+                onClick={() => {
+                  navigate("/message");
+                }}
+              />
+            </IconButton>
+
+            <IconButton onClick={() => navigate("/notifications")}>
+              {notificationlength > 0 && (
+                <Badge badgeContent={notificationlength} color="error">
+                  <Notifications sx={{ fontSize: "25px" }} />
+                </Badge>
+              )}
+              {notificationlength === 0 && (
+                <Notifications sx={{ fontSize: "25px" }} />
+              )}
+            </IconButton>
+
+            <IconButton>
+              <Help
+                sx={{ fontSize: "25px" }}
+                onClick={() => {
+                  navigate("/feedback");
+                }}
+              />
+            </IconButton>
+
             <FormControl variant="standard" value={fullName}>
               <Select
                 value={fullName}

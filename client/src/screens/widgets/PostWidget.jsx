@@ -68,7 +68,8 @@ const PostWidget = ({
 
   const isOwnPost = loggedInUserId === postUserId;
 
-  // like and unlike the post and send the request to the server for the notification part
+  // like and unlike the post 
+  // when user like the post then we send the data to the server to update the notification so user get notified when someone like their post
   const patchLike = async () => {
     try {
       const response = await fetch(
