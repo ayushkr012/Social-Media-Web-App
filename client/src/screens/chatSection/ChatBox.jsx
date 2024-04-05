@@ -1,14 +1,19 @@
 import { Box, Typography, IconButton } from "@mui/material";
-import { Call, VideoCall, Settings } from "@mui/icons-material"; // Import icons
+import { Call, VideoCall, Settings } from "@mui/icons-material"; 
 import UserChatFriend from "screens/chatSection/UserChatFriend";
 import { useSelector } from "react-redux";
 import FlexBetween from "components/FlexBetween";
 import WidgetWrapper from "components/WidgetWrapper";
 
 const ChatBox = () => {
-  const { friendId, name, subtitle, userPicturePath } = useSelector(
-    (state) => state.chatFriend
-  );
+  const chatFriend = useSelector((state) => state.chatFriend);
+
+  if (!chatFriend) {
+    // If chatFriend is null, you can return some placeholder or loading component
+    return <WidgetWrapper>Loading...</WidgetWrapper>;
+  }
+
+  const { friendId, name, subtitle, userPicturePath } = chatFriend;
 
   return (
     <WidgetWrapper>

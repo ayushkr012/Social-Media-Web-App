@@ -7,7 +7,7 @@ import { setFriends } from "state";
 import { Divider } from "@mui/material";
 // props data came from chatSection/index.jsx
 const FriendListWidget = ({ userId }) => {
- const BackendUrl = useSelector((state) => state.BackendUrl);
+  const BackendUrl = useSelector((state) => state.BackendUrl);
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
