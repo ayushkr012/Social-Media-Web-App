@@ -224,7 +224,7 @@ const PostWidget = ({
         </FlexBetween>
 
         <FlexBetween>
-          {isOwnPost && (
+          {!isOwnPost && (
             <IconButton onClick={() => setOpenDeleteDialog(true)}>
               <DeleteOutline />
             </IconButton>
