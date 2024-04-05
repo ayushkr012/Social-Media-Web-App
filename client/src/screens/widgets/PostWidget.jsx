@@ -1,5 +1,4 @@
 // props data came from the PostsWidget.jsx
-
 import {
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
@@ -56,6 +55,7 @@ const PostWidget = ({
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user?._id);
+  const BackendUrl = useSelector((state) => state.BackendUrl);
 
   const isLiked = likes && loggedInUserId && Boolean(likes[loggedInUserId]);
   const likeCount = likes
@@ -68,24 +68,21 @@ const PostWidget = ({
 
   const isOwnPost = loggedInUserId === postUserId;
 
-  // like and unlike the post 
+  // like and unlike the post
   // when user like the post then we send the data to the server to update the notification so user get notified when someone like their post
   const patchLike = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3001/posts/${postId}/like`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: loggedInUserId,
-            postUserId: postUserId,
-          }),
-        }
-      );
+      const response = await fetch(`${BackendUrl}posts/${postId}/like`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: loggedInUserId,
+          postUserId: postUserId,
+        }),
+      });
       const data = await response.json();
 
       // console.log("Data received from server:", data); // Log the data received from the server
@@ -111,7 +108,7 @@ const PostWidget = ({
         // here we pass the postId to delete the post
         // and the loggedInUserId to and isProfile to check when user is on the profile page then we return only userAllPost when user
         // is on the home page then we return all the post
-        `http://localhost:3001/posts/${postId}/${loggedInUserId}/?isProfile=${isProfile}`,
+        `${BackendUrl}/posts/${postId}/${loggedInUserId}/?isProfile=${isProfile}`,
         {
           method: "DELETE",
           headers: {
@@ -136,7 +133,7 @@ const PostWidget = ({
   /* ----------------- Share Post Implementation -----------------  */
   const handleSharePost = () => {
     // Generate shareable link
-    const shareableLink = `http://localhost:3001/posts/${postUserId}/posts`;
+    const shareableLink = `${BackendUrl}/posts/${postUserId}/posts`;
     setShareLink(shareableLink);
     setOpenShareDialog(true);
   };
@@ -201,7 +198,7 @@ const PostWidget = ({
           height="auto"
           alt="post"
           style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          src={`http://localhost:3001/assets/${picturePath}`}
+          src={`${BackendUrl}/assets/${picturePath}`}
         />
       )}
       {/*  -----------------------> Like, Comment, Share Section ----------------------------< */}

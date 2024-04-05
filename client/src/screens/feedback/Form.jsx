@@ -19,12 +19,14 @@ const initialValuesFeedback = {
 const FeedbackForm = () => {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const { firstName, lastName, email } = useSelector((state) => state.user);
+  const BackendUrl = useSelector((state) => state.BackendUrl);
   const token = useSelector((state) => state.token);
   const { palette } = useTheme();
   let navigate = useNavigate();
+   console.log(BackendUrl);
 
   const sendFeedback = async (values, onSubmitProps) => {
-    const responce = await fetch("http://localhost:3001/users/feedback", {
+    const responce = await fetch(`${BackendUrl}/users/feedback`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

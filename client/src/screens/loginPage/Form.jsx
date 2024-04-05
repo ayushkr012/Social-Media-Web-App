@@ -13,7 +13,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
 import * as yup from "yup"; // yup is a JavaScript library for object schema validation.
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch ,useSelector} from "react-redux";
 import { setLogin } from "state";
 import Dropzone from "react-dropzone";
 import FlexBetween from "components/FlexBetween";
@@ -75,6 +75,7 @@ const Form = () => {
   const isRegister = pageType === "register";
   const isOtpLogin = pageType === "otp";
   const isEnterOtp = pageType == "enterOtp";
+ const BackendUrl = useSelector((state) => state.BackendUrl);
 
   const handleOtpLogin = () => {
     // when user clink on login with otp set pageType to otp
@@ -82,7 +83,7 @@ const Form = () => {
   };
 
   const SendOtp = async (values, onSubmitProps) => {
-    const response = await fetch("http://localhost:3001/auth/sendotp", {
+    const response = await fetch(`${BackendUrl}/auth/sendotp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -106,7 +107,7 @@ const Form = () => {
   };
 
   const enterOtp = async (values, onSubmitProps) => {
-    const response = await fetch("http://localhost:3001/auth/verifyotp", {
+    const response = await fetch(`${BackendUrl}/auth/verifyotp`, {
       method: "POST",
       headers: {
         "Content-Type": "Application/json",
@@ -147,7 +148,7 @@ const Form = () => {
     formData.append("picturePath", values.picture.name);
 
     const savedUserResponse = await fetch(
-      "http://localhost:3001/auth/register",
+      `${BackendUrl}/auth/register`,
       {
         method: "POST",
         body: formData,
@@ -166,7 +167,7 @@ const Form = () => {
   };
 
   const login = async (values, onSubmitProps) => {
-    const loggedInResponse = await fetch("http://localhost:3001/auth/login", {
+    const loggedInResponse = await fetch(`${BackendUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values),

@@ -23,16 +23,14 @@ const HomePage = () => {
   const { _id, picturePath } = useSelector((state) => state.user); // destruct the user id and picture path from user after login
   const { palette } = useTheme();
   const dispatch = useDispatch();
+  const BackendUrl = useSelector((state) => state.BackendUrl);
   const token = useSelector((state) => state.token);
 
   const getNotification = async () => {
-    const response = await fetch(
-      `http://localhost:3001/users/notification/${_id}`,
-      {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`${BackendUrl}/users/notification/${_id}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await response.json();
     // console.log(notifications);
     dispatch(setNotifications({ notifications: data.updatedNotifications }));

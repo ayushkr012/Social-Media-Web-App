@@ -14,18 +14,16 @@ const Notification = () => {
   const [activeMenuItem, setActiveMenuItem] = useState("All");
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
+  const BackendUrl = useSelector((state) => state.BackendUrl);
 
   /* once i viwed the notification then set the notification count to 0 */
   dispatch(updateNotificationsCount(0));
 
   const getNotification = async () => {
-    const response = await fetch(
-      `http://localhost:3001/users/notification/${_id}`,
-      {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`${BackendUrl}/users/notification/${_id}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await response.json();
     // console.log(notifications);
     dispatch(setNotifications({ notifications: data.updatedNotifications }));

@@ -18,7 +18,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const { _id } = useSelector((state) => state.user); // destruct the id from the current login user
   const token = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends); // take a look of user schema for better understanding // here we grab the current login user friends list
-
+  const BackendUrl = useSelector((state) => state.BackendUrl);
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
   const primaryDark = palette.primary.dark;
@@ -31,16 +31,13 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
 
   //  addRemoveFriend
   const patchFriend = async () => {
-    const response = await fetch(
-      `http://localhost:3001/users/${_id}/${friendId}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${BackendUrl}/users/${_id}/${friendId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
     const data = await response.json();
     dispatch(setFriends({ friends: data }));
   };
@@ -49,7 +46,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   // and send the data to the server to update the notification so user get notified when someone view their profile
   const handleClick = async () => {
     const response = await fetch(
-      `http://localhost:3001/users/profileview/${_id}/${friendId}`,
+      `${BackendUrl}/users/profileview/${_id}/${friendId}`,
       {
         method: "GET",
         headers: {

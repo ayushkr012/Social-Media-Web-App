@@ -8,6 +8,7 @@ const initialState = {
   chatFriend: null, // state to hold the selected chat friend
   notifications: [], // state to hold notification
   notificationsCount: 0, // state to hold the count of notifications
+  BackendUrl: "https://social-media-web-app-o59e.onrender.com",
 };
 
 export const authSlice = createSlice({

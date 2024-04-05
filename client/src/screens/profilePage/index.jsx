@@ -8,15 +8,16 @@ import FriendListWidget from "screens/widgets/FriendListWidget";
 import PostsWidget from "screens/widgets/PostsWidget";
 import UserWidget from "screens/widgets/UserWidget";
 
+
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const { userId } = useParams(); // grab the userId from the url
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const { palette } = useTheme();
-
+  const BackendUrl = useSelector((state) => state.BackendUrl);
   const getUser = async () => {
-    const response = await fetch(`http://localhost:3001/users/${userId}`, {
+    const response = await fetch(`${BackendUrl}/users/${userId}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
