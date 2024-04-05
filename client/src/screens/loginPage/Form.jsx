@@ -13,7 +13,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
 import * as yup from "yup"; // yup is a JavaScript library for object schema validation.
 import { useNavigate } from "react-router-dom";
-import { useDispatch ,useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setLogin } from "state";
 import Dropzone from "react-dropzone";
 import FlexBetween from "components/FlexBetween";
@@ -75,7 +75,7 @@ const Form = () => {
   const isRegister = pageType === "register";
   const isOtpLogin = pageType === "otp";
   const isEnterOtp = pageType == "enterOtp";
- const BackendUrl = useSelector((state) => state.BackendUrl);
+  const BackendUrl = useSelector((state) => state.BackendUrl);
 
   const handleOtpLogin = () => {
     // when user clink on login with otp set pageType to otp
@@ -147,13 +147,10 @@ const Form = () => {
 
     formData.append("picturePath", values.picture.name);
 
-    const savedUserResponse = await fetch(
-      `${BackendUrl}/auth/register`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+    const savedUserResponse = await fetch(`${BackendUrl}/auth/register`, {
+      method: "POST",
+      body: formData,
+    });
     const json = await savedUserResponse.json();
     // onSubmitProps.resetForm();
 
@@ -262,6 +259,16 @@ const Form = () => {
                   error={Boolean(touched.lastName) && Boolean(errors.lastName)}
                   helperText={touched.lastName && errors.lastName}
                   sx={{ gridColumn: "span 2" }}
+                />
+                <TextField
+                  label="Email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.email}
+                  name="email"
+                  error={Boolean(touched.email) && Boolean(errors.email)}
+                  helperText={touched.email && errors.email}
+                  sx={{ gridColumn: "span 4" }}
                 />
                 <TextField
                   label="Location"

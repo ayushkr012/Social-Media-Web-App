@@ -9,6 +9,7 @@ const initialState = {
   notifications: [], // state to hold notification
   notificationsCount: 0, // state to hold the count of notifications
   BackendUrl: "https://social-media-web-app-o59e.onrender.com",
+  // BackendUrl:"http://localhost:3001",
 };
 
 export const authSlice = createSlice({
