@@ -29,7 +29,7 @@ const LoginPage = () => {
           variant="h5"
           sx={{ mb: "1.5rem", textAlign: "center" }}
         >
-          Welcome to Connectify, the Social Media for Connectify!
+          Welcome to Connectify Community!
         </Typography>
         <Form />
       </Box>

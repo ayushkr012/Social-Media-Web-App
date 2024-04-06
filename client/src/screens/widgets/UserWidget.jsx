@@ -22,7 +22,6 @@ const UserWidget = ({ userId, picturePath }) => {
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
   const BackendUrl = useSelector((state) => state.BackendUrl);
-
   const getUser = async () => {
     const response = await fetch(`${BackendUrl}/users/${userId}`, {
       method: "GET",
@@ -100,7 +99,7 @@ const UserWidget = ({ userId, picturePath }) => {
       {/* THIRD ROW */}
       <Box p="1rem 0">
         <FlexBetween mb="0.5rem">
-          <Typography color={medium}>Who's viewed your profile</Typography>
+          <Typography color={medium}>Profile View Count</Typography>
           <Typography color={main} fontWeight="500">
             {viewedProfile}
           </Typography>

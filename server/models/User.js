@@ -1,16 +1,26 @@
 import mongoose from "mongoose";
 
-const notificationSchema = new mongoose.Schema({
-  message: {
-    type: String,
-    required: true
+const notificationSchema = new mongoose.Schema(
+  {
+    message: {
+      type: String,
+      required: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId, // Assuming userId refers to the ObjectId of the user
+      required: true,
+    },
+    read: {
+      type: Boolean,
+      default: false, // Initially set to false, indicating the notification has not been read
+    },
+    time: {
+      type: Date,
+      default: Date.now, // Set to the current date and time when the notification is created
+    },
   },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId, // Assuming userId refers to the ObjectId of the user
-    required: true
-  }
-}, { _id: false }); // You may not need _id for notification objects
-
+  { _id: false }
+); // You may not need _id for notification objects
 
 const userSchema = new mongoose.Schema(
   {

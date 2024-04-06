@@ -31,8 +31,8 @@ export const createPost = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-/* GET getFeedPosts, getUserPosts, ( here we have to add the get friends post ) */
 
+/* GET getFeedPosts, getUserPosts, ( here we have to add the get friends post ) */
 export const getFeedPosts = async (req, res) => {
   try {
     // const posts = await Post.find(); // Return all posts
@@ -71,12 +71,17 @@ export const getFriendsPosts = async (req, res) => {
   }
 };
 
-/* UPDATE */
+ /* Update Notification and  impressions and Likes when SomeOne Like the */
 export const likePost = async (req, res) => {
   try {
     const { id } = req.params; // id of the post
     const { userId, postUserId } = req.body; // userId is the id of the user who like the post and postUserId is the id of the user who created the post
     const post = await Post.findById(id); // find the post by thier id
+
+    // Update the PostImpression number for postUserId means the user who created the post
+    const result = await User.findByIdAndUpdate(postUserId, {
+      $inc: { impressions: 1 },
+    });
 
     // here we check if the user already liked the post or not
     const isLiked = post.likes.get(userId);
@@ -95,6 +100,9 @@ export const likePost = async (req, res) => {
       { likes: post.likes },
       { new: true }
     );
+
+    // Save the updated post
+    // const updatedPost = await post.save();
 
     //  -------------------------------------> User NOTIFICATION PART ------------------------------<
 
@@ -117,6 +125,8 @@ export const likePost = async (req, res) => {
         return {
           userId: notification.userId,
           message: notification.message,
+          time: notification.time,
+          read: notification.read,
         };
       })
     );
@@ -124,7 +134,7 @@ export const likePost = async (req, res) => {
     // Merge user details with notifications and include message
     const formattedNotifications = await Promise.all(
       userNotifications.map(async (notification) => {
-        const { userId, message } = notification;
+        const { userId, message, time, read } = notification;
 
         try {
           const userDetails = await User.findById(userId);
@@ -137,6 +147,8 @@ export const likePost = async (req, res) => {
               location: userDetails.location,
               picturePath: userDetails.picturePath,
               message,
+              time,
+              read,
             };
           } else {
             return null; // Return null if user details are not found (optional)
@@ -155,9 +167,12 @@ export const likePost = async (req, res) => {
 
     console.log("filteredNotifications", filteredNotifications);
 
+    // Reverse the filteredNotifications array
+    const reversedNotifications = filteredNotifications.reverse();
+
     res.status(200).json({
       updatedPost: updatedPost,
-      updatedNotifications: filteredNotifications,
+      updatedNotifications: reversedNotifications,
     });
   } catch (error) {
     console.log(error);

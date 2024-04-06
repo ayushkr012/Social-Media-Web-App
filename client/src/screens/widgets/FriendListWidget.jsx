@@ -14,13 +14,10 @@ const FriendListWidget = ({ userId }) => {
   const BackendUrl = useSelector((state) => state.BackendUrl);
 
   const getFriends = async () => {
-    const response = await fetch(
-      `${BackendUrl}/users/${userId}/friends`,
-      {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`${BackendUrl}/users/${userId}/friends`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await response.json();
     dispatch(setFriends({ friends: data }));
   };
@@ -42,9 +39,9 @@ const FriendListWidget = ({ userId }) => {
       <Divider sx={{ mb: "1.5rem" }} />
       <Box display="flex" flexDirection="column" gap="1.5rem">
         {Array.isArray(friends) &&
-          friends.map((friend) => (
+          friends.map((friend, index) => (
             <Friend
-              key={friend._id}
+              key={`${friend.userId}_${index}`}
               friendId={friend._id}
               name={`${friend.firstName} ${friend.lastName}`}
               subtitle={friend.occupation}

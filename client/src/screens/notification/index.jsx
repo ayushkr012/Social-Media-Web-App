@@ -5,7 +5,7 @@ import Navbar from "screens/navbar";
 import WidgetWrapper from "components/WidgetWrapper";
 import NotificationWidget from "screens/widgets/NotificationWidget";
 import FlexBetween from "components/FlexBetween";
-import { setNotifications, updateNotificationsCount } from "state";
+import { setNotifications } from "state";
 import { useDispatch } from "react-redux";
 const Notification = () => {
   const { palette } = useTheme();
@@ -16,22 +16,19 @@ const Notification = () => {
   const token = useSelector((state) => state.token);
   const BackendUrl = useSelector((state) => state.BackendUrl);
 
-  /* once i viwed the notification then set the notification count to 0 */
-  dispatch(updateNotificationsCount(0));
+  // useEffect(() => {
+  //   const getNotification = async () => {
+  //     const response = await fetch(`${BackendUrl}/users/notification/${_id}`, {
+  //       method: "GET",
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     const data = await response.json();
+  //     // console.log(notifications);
+  //     dispatch(setNotifications({ notifications: data.updatedNotifications }));
+  //   };
 
-  const getNotification = async () => {
-    const response = await fetch(`${BackendUrl}/users/notification/${_id}`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    // console.log(notifications);
-    dispatch(setNotifications({ notifications: data.updatedNotifications }));
-  };
-
-  useEffect(() => {
-    getNotification();
-  }, []);
+  //   getNotification();
+  // }, []);
 
   const BoxStyle = {
     padding: "0.8rem",
@@ -186,6 +183,7 @@ const Notification = () => {
           <Box m="2rem 0" />
         </Box>
 
+        {/* right part of notification */}
         <Box
           flexBasis={isNonMobileScreens ? "22%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}

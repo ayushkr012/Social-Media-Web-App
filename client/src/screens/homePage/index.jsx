@@ -19,13 +19,15 @@ export default function HomePage(){}
 */
 
 const HomePage = () => {
+  const dispatch = useDispatch();
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const { _id, picturePath } = useSelector((state) => state.user); // destruct the user id and picture path from user after login
   const { palette } = useTheme();
-  const dispatch = useDispatch();
+
   const BackendUrl = useSelector((state) => state.BackendUrl);
   const token = useSelector((state) => state.token);
 
+  // get the notifications when user logs in and set the notifications
   const getNotification = async () => {
     const response = await fetch(`${BackendUrl}/users/notification/${_id}`, {
       method: "GET",
@@ -35,10 +37,9 @@ const HomePage = () => {
     // console.log(notifications);
     dispatch(setNotifications({ notifications: data.updatedNotifications }));
   };
-
   useEffect(() => {
     getNotification();
-  });
+  }, []);
 
   return (
     <Box>

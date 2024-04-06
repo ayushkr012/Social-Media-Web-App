@@ -208,13 +208,21 @@ export const feedback = async (req, res) => {
   }
 };
 
-/* Notification  when user view profile Profile View */
+/* Update Notification and profileViewCount when SomeOne View Profile  */
 
 export const profileView = async (req, res) => {
   try {
+    // here userId indicate the currentLogin userId and PostUserId means jiska post hai uska id
     const { userId, postUserId } = req.params;
     const user = await User.findById(userId);
     const postUser = await User.findById(postUserId);
+
+    // Update profile View Number for postUserId when it is viewed by userId
+    if (userId != postUserId) {
+      const result = await User.findByIdAndUpdate(postUserId, {
+        $inc: { viewedProfile: 1 },
+      });
+    }
 
     // user not get notified when they view their own profile
     if (userId != postUserId) {
@@ -226,12 +234,14 @@ export const profileView = async (req, res) => {
 
     await postUser.save();
 
-    // Retrieve the updated notifications for the user
+    // Retrieve the updated notifications for the current user
     const userNotifications = await Promise.all(
       user.notifications.map(async (notification) => {
         return {
           userId: notification.userId,
           message: notification.message,
+          time: notification.time,
+          read: notification.read,
         };
       })
     );
@@ -239,7 +249,7 @@ export const profileView = async (req, res) => {
     // Merge user details with notifications and include message
     const formattedNotifications = await Promise.all(
       userNotifications.map(async (notification) => {
-        const { userId, message } = notification;
+        const { userId, message, time, read } = notification;
 
         try {
           const userDetails = await User.findById(userId);
@@ -252,6 +262,8 @@ export const profileView = async (req, res) => {
               location: userDetails.location,
               picturePath: userDetails.picturePath,
               message,
+              time,
+              read,
             };
           } else {
             return null; // Return null if user details are not found (optional)
@@ -268,7 +280,10 @@ export const profileView = async (req, res) => {
       (notification) => notification !== null
     );
 
-    res.status(200).json({ updatedNotifications: filteredNotifications });
+    // Reverse the filteredNotifications array
+    const reversedNotifications = filteredNotifications.reverse();
+
+    res.status(200).json({ updatedNotifications: reversedNotifications });
   } catch (err) {
     console.log(err);
     res.status(404).json({ message: err.message });
@@ -281,12 +296,14 @@ export const getNotification = async (req, res) => {
     const { userId } = req.params;
     const user = await User.findById(userId);
 
-    // Retrieve the updated notifications for the user
+    // Retrieve the updated notifications for the current user
     const userNotifications = await Promise.all(
       user.notifications.map(async (notification) => {
         return {
           userId: notification.userId,
           message: notification.message,
+          time: notification.time,
+          read: notification.read,
         };
       })
     );
@@ -294,7 +311,7 @@ export const getNotification = async (req, res) => {
     // Merge user details with notifications and include message
     const formattedNotifications = await Promise.all(
       userNotifications.map(async (notification) => {
-        const { userId, message } = notification;
+        const { userId, message, time, read } = notification;
 
         try {
           const userDetails = await User.findById(userId);
@@ -307,6 +324,8 @@ export const getNotification = async (req, res) => {
               location: userDetails.location,
               picturePath: userDetails.picturePath,
               message,
+              time,
+              read,
             };
           } else {
             return null; // Return null if user details are not found (optional)
@@ -323,7 +342,90 @@ export const getNotification = async (req, res) => {
       (notification) => notification !== null
     );
 
-    res.status(200).json({ updatedNotifications: filteredNotifications });
+    // Reverse the filteredNotifications array
+    const reversedNotifications = filteredNotifications.reverse();
+
+    res.status(200).json({ updatedNotifications: reversedNotifications });
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({ message: err.message });
+  }
+};
+
+/* Update Notification Status after View */
+
+export const updateNotificationStatus = async (req, res) => {
+  try {
+    const { userId, friendId } = req.params;
+    const user = await User.findById(userId);
+
+    // Update profile View Number for postUserId when it is viewed by userId
+    if (userId != friendId) {
+      const result = await User.findByIdAndUpdate(friendId, {
+        $inc: { viewedProfile: 1 },
+      });
+    }
+
+    // Update notifications for the current user
+    user.notifications.forEach((notification) => {
+      if (notification.userId.equals(friendId)) {
+        notification.read = true;
+      }
+    });
+
+    // Save the updated user document
+    await user.save();
+
+    // Retrieve the updated notifications for the Current user
+    const userNotifications = await Promise.all(
+      user.notifications.map(async (notification) => {
+        return {
+          userId: notification.userId,
+          message: notification.message,
+          time: notification.time,
+          read: notification.read,
+        };
+      })
+    );
+
+    // Merge user details with notifications and include message
+    const formattedNotifications = await Promise.all(
+      userNotifications.map(async (notification) => {
+        const { userId, message, time, read } = notification;
+
+        try {
+          const userDetails = await User.findById(userId);
+          if (userDetails) {
+            return {
+              userId,
+              firstName: userDetails.firstName,
+              lastName: userDetails.lastName,
+              occupation: userDetails.occupation,
+              location: userDetails.location,
+              picturePath: userDetails.picturePath,
+              message,
+              time,
+              read,
+            };
+          } else {
+            return null; // Return null if user details are not found (optional)
+          }
+        } catch (error) {
+          console.error("Error fetching user details:", error);
+          return null;
+        }
+      })
+    );
+
+    // Filter out null values if any
+    const filteredNotifications = formattedNotifications.filter(
+      (notification) => notification !== null
+    );
+
+    // Reverse the filteredNotifications array
+    const reversedNotifications = filteredNotifications.reverse();
+
+    res.status(200).json({ updatedNotifications: reversedNotifications });
   } catch (err) {
     console.log(err);
     res.status(404).json({ message: err.message });

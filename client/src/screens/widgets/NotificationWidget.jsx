@@ -24,14 +24,16 @@ const NotificationWidget = ({ userId }) => {
     >
       <Box display="flex" flexDirection="column" gap="2rem">
         {Array.isArray(notifications) &&
-          notifications.map((user) => (
-            <NotificationList
-              // key={user.userId}
+          notifications.map((user, index) => (
+            <NotificationList // it is component : path client/src/components/NotificationList.jsx
+              key={`${user.userId}_${index}`}
               friendId={user.userId}
               name={`${user.firstName} ${user.lastName}`}
               subtitle={user.occupation}
               userPicturePath={user.picturePath}
               message={user.message}
+              time={user.time}
+              read={user.read}
             />
           ))}
         {(!notifications || notifications.length === 0) && (

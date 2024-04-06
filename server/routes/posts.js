@@ -19,9 +19,7 @@ The colon (:) before userId indicates that userId is a route parameter.
 For example, if the URL is http://example.com/posts/123/posts, then userId will be replaced with 123.
 */
 
-/* UPDATE */
-// the HTTP PATCH method is used to apply partial modifications to a resource.
-// the HTTP PUT method is used to update am entire resource.
+/* Update Notification and  impressions and Likes when SomeOne Like the Post */
 postRoutes.patch("/:id/like", verifyToken, likePost);
 
 /*DELETE  Post */
@@ -30,3 +28,8 @@ postRoutes.delete("/:PostId/:userId", verifyToken, deletePost);
 // we pass a boolean value it will be considered as a string so we can't use it as a route parameter we can use it as a query parameter like this {isProfile}=req.query
 
 export default postRoutes;
+
+/*
+ the HTTP PATCH method is used to apply partial modifications to a resource.
+ the HTTP PUT method is used to update am entire resource. 
+ */

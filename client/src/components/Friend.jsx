@@ -29,7 +29,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const isFriend =
     Array.isArray(friends) && friends.find((friend) => friend._id === friendId);
 
-  //  addRemoveFriend
+  /*  ---------------------> addRemoveFriend <-----------------------*/
   const patchFriend = async () => {
     const response = await fetch(`${BackendUrl}/users/${_id}/${friendId}`, {
       method: "PATCH",
@@ -42,8 +42,9 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
     dispatch(setFriends({ friends: data }));
   };
 
-  //  no navigate to the user friend profile page
+  // navigate to the user friend profile page
   // and send the data to the server to update the notification so user get notified when someone view their profile
+  // and update the profile view Count
   const handleClick = async () => {
     const response = await fetch(
       `${BackendUrl}/users/profileview/${_id}/${friendId}`,

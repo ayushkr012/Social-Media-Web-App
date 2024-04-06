@@ -23,16 +23,13 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
   // get all the post of particular user
   const getUserPosts = async () => {
-    const response = await fetch(
-      `${BackendUrl}/posts/${userId}/posts`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${BackendUrl}/posts/${userId}/posts`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // "Content-Type": "application/json",
+      },
+    });
     const data = await response.json();
     dispatch(setPosts({ posts: data }));
   };

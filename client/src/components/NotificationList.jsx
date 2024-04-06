@@ -4,14 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
+import { setNotifications } from "state";
 
-// props data came from the PostWidget.jsx and FriendListWidget.jsx
+// props data came from the NotificationWidget.jsx
 const NotificationList = ({
   friendId,
   name,
   subtitle,
   userPicturePath,
   message,
+  time,
+  read,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,9 +26,22 @@ const NotificationList = ({
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
   const mediumMain = palette.neutral.mediumMain;
+  const BackendUrl = useSelector((state) => state.BackendUrl);
+  const { _id } = useSelector((state) => state.user);
 
-  // when user click on notification then they navigate to the crossponding profile page user profile page
+  // when user click on notification then they navigate to the Crossponding user profile page
   const handleClick = async () => {
+    //  we update the notification read status to true
+    const response = await fetch(
+      `${BackendUrl}/users/updateNotificationStatus/${_id}/${friendId}`,
+      {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await response.json();
+    dispatch(setNotifications({ notifications: data.updatedNotifications }));
+
     navigate(`/profile/${friendId}`);
     //  we go to the user friend profile page and then again go to the someone profile page
     // then url update with react router but component does not reender so we use navigate(0) to reender the component

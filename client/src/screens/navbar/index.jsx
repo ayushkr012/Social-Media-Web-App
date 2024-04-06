@@ -33,7 +33,14 @@ export default function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
-  const notificationlength = useSelector((state) => state.notificationsCount);
+  const notifications = useSelector((state) => state.notifications);
+
+  // filter out the notifications which are not viewed
+  const unreadNotifications = notifications.filter(
+    (notification) => !notification.read
+  );
+
+  const unreadCount = notifications.length > 0 ? unreadNotifications.length : 0;
 
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
@@ -89,32 +96,28 @@ export default function Navbar() {
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton>
-          <IconButton>
-            <Message
-              sx={{ fontSize: "25px" }}
-              onClick={() => {
-                navigate("/message");
-              }}
-            />
+          <IconButton
+            onClick={() => {
+              navigate("/message");
+            }}
+          >
+            <Message sx={{ fontSize: "25px" }} />
           </IconButton>
 
           <IconButton onClick={() => navigate("/notifications")}>
-            {notificationlength > 0 && (
-              <Badge badgeContent={notificationlength} color="error">
+            {unreadCount > 0 && (
+              <Badge badgeContent={unreadCount} color="error">
                 <Notifications sx={{ fontSize: "25px" }} />
               </Badge>
             )}
-            {notificationlength === 0 && (
-              <Notifications sx={{ fontSize: "25px" }} />
-            )}
+            {unreadCount === 0 && <Notifications sx={{ fontSize: "25px" }} />}
           </IconButton>
-          <IconButton>
-            <Help
-              sx={{ fontSize: "25px" }}
-              onClick={() => {
-                navigate("/feedback");
-              }}
-            />
+          <IconButton
+            onClick={() => {
+              navigate("/feedback");
+            }}
+          >
+            <Help sx={{ fontSize: "25px" }} />
           </IconButton>
 
           <FormControl variant="standard" value={fullName}>
@@ -196,33 +199,28 @@ export default function Navbar() {
                 <LightMode sx={{ color: dark, fontSize: "25px" }} />
               )}
             </IconButton>
-            <IconButton>
-              <Message
-                sx={{ fontSize: "25px" }}
-                onClick={() => {
-                  navigate("/message");
-                }}
-              />
+            <IconButton
+              onClick={() => {
+                navigate("/message");
+              }}
+            >
+              <Message sx={{ fontSize: "25px" }} />
             </IconButton>
 
             <IconButton onClick={() => navigate("/notifications")}>
-              {notificationlength > 0 && (
-                <Badge badgeContent={notificationlength} color="error">
+              {unreadCount > 0 && (
+                <Badge badgeContent={unreadCount} color="error">
                   <Notifications sx={{ fontSize: "25px" }} />
                 </Badge>
               )}
-              {notificationlength === 0 && (
-                <Notifications sx={{ fontSize: "25px" }} />
-              )}
+              {unreadCount === 0 && <Notifications sx={{ fontSize: "25px" }} />}
             </IconButton>
-
-            <IconButton>
-              <Help
-                sx={{ fontSize: "25px" }}
-                onClick={() => {
-                  navigate("/feedback");
-                }}
-              />
+            <IconButton
+              onClick={() => {
+                navigate("/feedback");
+              }}
+            >
+              <Help sx={{ fontSize: "25px" }} />
             </IconButton>
 
             <FormControl variant="standard" value={fullName}>

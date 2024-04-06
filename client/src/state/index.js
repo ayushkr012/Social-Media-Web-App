@@ -1,15 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  mode: "light",
+  mode: "dark",
   user: null,
   token: null,
   posts: [],
   chatFriend: null, // state to hold the selected chat friend
   notifications: [], // state to hold notification
-  notificationsCount: 0, // state to hold the count of notifications
   BackendUrl: "https://social-media-web-app-o59e.onrender.com",
-  // BackendUrl:"http://localhost:3001",
+  // BackendUrl: "http://localhost:3001",
 };
 
 export const authSlice = createSlice({
@@ -49,15 +48,10 @@ export const authSlice = createSlice({
     setChatFriend: (state, action) => {
       state.chatFriend = action.payload;
     },
+
     // to set notifications
     setNotifications: (state, action) => {
-      state.notifications = action.payload.notifications;
-      state.notificationsCount =
-        action.payload.notifications.length - state.notificationsCount;
-    },
-    // to update the notifications Count
-    updateNotificationsCount: (state, action) => {
-      state.notificationsCount = action.payload;
+      state.notifications = action.payload.notifications; // set the notifications
     },
   },
 });
@@ -71,6 +65,5 @@ export const {
   setPost,
   setChatFriend,
   setNotifications,
-  updateNotificationsCount,
 } = authSlice.actions;
 export default authSlice.reducer;

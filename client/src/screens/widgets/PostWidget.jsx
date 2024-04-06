@@ -1,4 +1,3 @@
-// props data came from the PostsWidget.jsx
 import {
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
@@ -35,6 +34,7 @@ import { setPost } from "state";
 import { setPosts, setNotifications } from "state";
 import { toast } from "react-toastify";
 
+// props data came from the PostsWidget.jsx
 const PostWidget = ({
   postId,
   postUserId,
@@ -56,11 +56,10 @@ const PostWidget = ({
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user?._id);
   const BackendUrl = useSelector((state) => state.BackendUrl);
+  console.log("Likes:", likes.length);
 
   const isLiked = likes && loggedInUserId && Boolean(likes[loggedInUserId]);
-  const likeCount = likes
-    ? Object.keys(likes).length
-    : Object.keys(likes).length;
+  const likeCount = likes ? Object.keys(likes).length : 0;
 
   const { palette } = useTheme();
   const main = palette?.neutral?.main;
@@ -72,7 +71,7 @@ const PostWidget = ({
   // when user like the post then we send the data to the server to update the notification so user get notified when someone like their post
   const patchLike = async () => {
     try {
-      const response = await fetch(`${BackendUrl}posts/${postId}/like`, {
+      const response = await fetch(`${BackendUrl}/posts/${postId}/like`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -87,11 +86,11 @@ const PostWidget = ({
 
       // console.log("Data received from server:", data); // Log the data received from the server
 
-      // Dispatch the setNotifications action to update the notifications
-      dispatch(setNotifications({ notifications: data.updatedNotifications }));
-
       // Dispatch the setPost action to update the liked post
       dispatch(setPost({ post: data.updatedPost }));
+
+      // Dispatch the setNotifications action to update the notifications
+      dispatch(setNotifications({ notifications: data.updatedNotifications }));
 
       console.log(data.updatedNotifications);
     } catch (error) {
