@@ -4,13 +4,20 @@ import {
   FavoriteOutlined,
   ShareOutlined,
   DeleteOutline,
+  DeleteOutlined,
+  EditOutlined,
+  ImageOutlined,
   WhatsApp,
   LinkedIn,
   Email,
   Telegram,
   Twitter,
   Instagram,
+  AttachFileOutlined,
+  GifBoxOutlined,
   Message,
+  MicOutlined,
+  MoreHorizOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -19,15 +26,18 @@ import {
   IconButton,
   Typography,
   useTheme,
+  InputBase,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  useMediaQuery,
 } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
+import Dropzone from "react-dropzone";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
@@ -47,9 +57,16 @@ const PostWidget = ({
   comments,
   isProfile,
 }) => {
+  const { palette } = useTheme();
   const [isComments, setIsComments] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false); // State for edit modal
+  const [isImage, setIsImage] = useState(false);
+  const [image, setImage] = useState(null);
+  const [newDescription, setDescription] = useState(description);
+  const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+
   const [shareLink, setShareLink] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
   const dispatch = useDispatch();
@@ -61,13 +78,45 @@ const PostWidget = ({
   const isLiked = likes && loggedInUserId && Boolean(likes[loggedInUserId]);
   const likeCount = likes ? Object.keys(likes).length : 0;
 
-  const { palette } = useTheme();
   const main = palette?.neutral?.main;
   const primary = palette?.primary?.main;
+  const mediumMain = palette.neutral.mediumMain;
+  const medium = palette.neutral.medium;
 
   const isOwnPost = loggedInUserId === postUserId;
 
-  // like and unlike the post
+  const handleEditPost = async () => {
+    const formData = new FormData();
+    formData.append("description", newDescription);
+    if (image) {
+      formData.append("picture", image);
+      formData.append("picturePath", image.name);
+    }
+
+    try {
+      const response = await fetch(`${BackendUrl}/posts/${postId}/editPost`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        dispatch(setPost({ post: data.updatedPost }));
+        toast.success("Post edited successfully", { autoClose: 1000 });
+        setOpenEditModal(false);
+        setImage(null);
+        setDescription("");
+      } else {
+        toast.error("Failed to edit post");
+      }
+    } catch (error) {
+      console.error("Error editing post:", error);
+      toast.error("Error editing post");
+    }
+  };
+
+  /* -----------------------------> like and unlike the post Implementation--------------------------< */
   // when user like the post then we send the data to the server to update the notification so user get notified when someone like their post
   const patchLike = async () => {
     try {
@@ -200,7 +249,7 @@ const PostWidget = ({
           src={`${BackendUrl}/assets/${picturePath}`}
         />
       )}
-      {/*  -----------------------> Like, Comment, Share Section ----------------------------< */}
+      {/*  -----------------------> Like, Comment, Share  and edit Section ----------------------------< */}
       <FlexBetween mt="0.25rem">
         <FlexBetween gap="1rem">
           <FlexBetween gap="0.3rem">
@@ -223,16 +272,161 @@ const PostWidget = ({
         </FlexBetween>
 
         <FlexBetween>
-          {isOwnPost && (
-            <IconButton onClick={() => setOpenDeleteDialog(true)}>
-              <DeleteOutline />
-            </IconButton>
-          )}
           <IconButton onClick={handleSharePost}>
             <ShareOutlined />
           </IconButton>
+          {isOwnPost && (
+            <FlexBetween>
+              <IconButton onClick={() => setOpenDeleteDialog(true)}>
+                <DeleteOutline />
+              </IconButton>
+              <IconButton onClick={() => setOpenEditModal(true)}>
+                <EditOutlined />
+              </IconButton>
+            </FlexBetween>
+          )}
         </FlexBetween>
       </FlexBetween>
+      {/* ----------------------->   Edit Post Modal dialog --------------------< */}
+      <Dialog
+        open={openEditModal}
+        onClose={() => setOpenEditModal(false)}
+        aria-labelledby="edit-post-dialog-title"
+      >
+        <DialogTitle id="edit-post-dialog-title" sx={{ textAlign: "center" }}>
+          Edit your post details:
+        </DialogTitle>
+        <DialogContent>
+          <WidgetWrapper>
+            <FlexBetween gap="1.5rem">
+              <Friend
+                friendId={postUserId}
+                name={name}
+                subtitle={location}
+                userPicturePath={userPicturePath}
+              />
+              <InputBase
+                placeholder="What's on your mind..."
+                onChange={(e) => setDescription(e.target.value)}
+                value={newDescription}
+                sx={{
+                  width: "100%",
+                  backgroundColor: palette.neutral.light,
+                  borderRadius: "2rem",
+                  padding: "1rem 2rem",
+                }}
+              />
+            </FlexBetween>
+            {!isImage && (
+              <img
+                width="100%"
+                height="auto"
+                alt="post"
+                style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
+                src={`${BackendUrl}/assets/${picturePath}`}
+              />
+            )}
+            {isImage && (
+              <Box
+                border={`1px solid ${medium}`}
+                borderRadius="5px"
+                mt="1rem"
+                p="1rem"
+              >
+                <Dropzone
+                  acceptedFiles=".jpg,.jpeg,.png"
+                  multiple={false}
+                  onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
+                >
+                  {({ getRootProps, getInputProps }) => (
+                    <FlexBetween>
+                      <Box
+                        {...getRootProps()}
+                        // border={`2px dashed ${palette.primary.main}`}
+                        // p="1rem"
+                        width="100%"
+                        sx={{ "&:hover": { cursor: "pointer" } }}
+                      >
+                        <input {...getInputProps()} />
+                        {!image ? (
+                          <Box border={`2px dashed ${palette.primary.main}`}>
+                            <p>Add Image Here</p>
+                          </Box>
+                        ) : (
+                          <FlexBetween>
+                            <FlexBetween>
+                              {/* <Typography>{image.name}</Typography> */}
+                              <img
+                                width="100%"
+                                height="auto"
+                                alt="post"
+                                style={{
+                                  borderRadius: "0.75rem",
+                                  marginTop: "0rem",
+                                }}
+                                src={URL.createObjectURL(image)} // Use URL.createObjectURL to display the selected image
+                              />
+                            </FlexBetween>
+                            <EditOutlined sx={{ marginLeft: "0.9rem" }} />
+                          </FlexBetween>
+                        )}
+                      </Box>
+                      {image && (
+                        <IconButton
+                          onClick={() => setImage(null)}
+                          sx={{ width: "9%" }}
+                        >
+                          <DeleteOutlined />
+                        </IconButton>
+                      )}
+                    </FlexBetween>
+                  )}
+                </Dropzone>
+              </Box>
+            )}
+            <Divider sx={{ margin: "1.25rem 0" }} />
+            <FlexBetween>
+              <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
+                <ImageOutlined sx={{ color: mediumMain }} />
+                <Typography
+                  color={mediumMain}
+                  sx={{ "&:hover": { cursor: "pointer", color: medium } }}
+                >
+                  Image
+                </Typography>
+              </FlexBetween>
+
+              {isNonMobileScreens ? (
+                <>
+                  <FlexBetween gap="0.25rem">
+                    <GifBoxOutlined sx={{ color: mediumMain }} />
+                    <Typography color={mediumMain}>Clip</Typography>
+                  </FlexBetween>
+
+                  <FlexBetween gap="0.25rem">
+                    <AttachFileOutlined sx={{ color: mediumMain }} />
+                    <Typography color={mediumMain}>Attachment</Typography>
+                  </FlexBetween>
+
+                  <FlexBetween gap="0.25rem">
+                    <MicOutlined sx={{ color: mediumMain }} />
+                    <Typography color={mediumMain}>Audio</Typography>
+                  </FlexBetween>
+                </>
+              ) : (
+                // here we have to work on when smallerscreens it also show above all icon when user click on more icon
+                <FlexBetween gap="0.25rem">
+                  <MoreHorizOutlined sx={{ color: mediumMain }} />
+                </FlexBetween>
+              )}
+            </FlexBetween>
+          </WidgetWrapper>
+        </DialogContent>
+        <DialogActions>
+          <button onClick={() => setOpenEditModal(false)}>Cancel</button>
+          <button onClick={handleEditPost}>Save Changes</button>
+        </DialogActions>
+      </Dialog>
       {/*---------------->  Delete confirmation dialog -------------<*/}
       <Dialog
         open={openDeleteDialog}

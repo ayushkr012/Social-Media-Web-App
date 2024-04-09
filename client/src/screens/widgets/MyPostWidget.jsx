@@ -31,7 +31,7 @@ const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
-  const [post, setPost] = useState("");
+  const [description, setDescription] = useState("");
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -43,7 +43,7 @@ const MyPostWidget = ({ picturePath }) => {
   const handlePost = async () => {
     const formData = new FormData();
     formData.append("userId", _id);
-    formData.append("description", post);
+    formData.append("description", description);
     if (image) {
       formData.append("picture", image);
       formData.append("picturePath", image.name);
@@ -64,7 +64,7 @@ const MyPostWidget = ({ picturePath }) => {
     // after the api call we reset the state
     // setTimeout(() => {
     setImage(null);
-    setPost("");
+    setDescription("");
     // }, 300);
   };
 
@@ -74,8 +74,8 @@ const MyPostWidget = ({ picturePath }) => {
         <UserImage image={picturePath} />
         <InputBase
           placeholder="What's on your mind..."
-          onChange={(e) => setPost(e.target.value)}
-          value={post}
+          onChange={(e) => setDescription(e.target.value)}
+          value={description}
           sx={{
             width: "100%",
             backgroundColor: palette.neutral.light,
@@ -100,25 +100,36 @@ const MyPostWidget = ({ picturePath }) => {
               <FlexBetween>
                 <Box
                   {...getRootProps()}
-                  border={`2px dashed ${palette.primary.main}`}
-                  p="1rem"
+                  // border={`2px dashed ${palette.primary.main}`}
+                  // p="1rem"
                   width="100%"
                   sx={{ "&:hover": { cursor: "pointer" } }}
                 >
                   <input {...getInputProps()} />
                   {!image ? (
-                    <p>Add Image Here</p>
+                    <Box border={`2px dashed ${palette.primary.main}`}>
+                      <p>Add Image Here</p>
+                    </Box>
                   ) : (
                     <FlexBetween>
-                      <Typography>{image.name}</Typography>
-                      <EditOutlined />
+                      <FlexBetween>
+                        {/* <Typography>{image.name}</Typography> */}
+                        <img
+                          width="100%"
+                          height="auto"
+                          alt="post"
+                          style={{ borderRadius: "0.75rem", marginTop: "0rem" }}
+                          src={URL.createObjectURL(image)} // Use URL.createObjectURL to display the selected image
+                        />
+                      </FlexBetween>
+                      <EditOutlined sx={{ marginLeft: "0.9rem" }} />
                     </FlexBetween>
                   )}
                 </Box>
                 {image && (
                   <IconButton
                     onClick={() => setImage(null)}
-                    sx={{ width: "15%" }}
+                    sx={{ width: "9%" }}
                   >
                     <DeleteOutlined />
                   </IconButton>
@@ -165,7 +176,7 @@ const MyPostWidget = ({ picturePath }) => {
         )}
 
         <Button
-          disabled={!post}
+          // disabled={!post} // we keep as it optional user can post their psot without descerption
           onClick={handlePost}
           sx={{
             color: palette.background.alt,
