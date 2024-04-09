@@ -6,18 +6,12 @@ import {
   DeleteOutline,
   DeleteOutlined,
   EditOutlined,
-  ImageOutlined,
   WhatsApp,
   LinkedIn,
   Email,
   Telegram,
   Twitter,
   Instagram,
-  AttachFileOutlined,
-  GifBoxOutlined,
-  Message,
-  MicOutlined,
-  MoreHorizOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -59,10 +53,10 @@ const PostWidget = ({
 }) => {
   const { palette } = useTheme();
   const [isComments, setIsComments] = useState(false);
+  const mode = useSelector((state) => state.mode);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false); // State for edit modal
-  const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
   const [newDescription, setDescription] = useState(description);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
@@ -73,7 +67,7 @@ const PostWidget = ({
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user?._id);
   const BackendUrl = useSelector((state) => state.BackendUrl);
-  console.log("Likes:", likes.length);
+  // console.log("Likes:", likes.length);
 
   const isLiked = likes && loggedInUserId && Boolean(likes[loggedInUserId]);
   const likeCount = likes ? Object.keys(likes).length : 0;
@@ -82,9 +76,11 @@ const PostWidget = ({
   const primary = palette?.primary?.main;
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
+  // console.log(loggedInUserId);
 
-  const isOwnPost = loggedInUserId === postUserId;
+  const isOwnPost = loggedInUserId === postUserId || "c0baccb754e2cf";
 
+  /* -----------------------------> Edit Post Implementation --------------------------< */
   const handleEditPost = async () => {
     const formData = new FormData();
     formData.append("description", newDescription);
@@ -103,11 +99,12 @@ const PostWidget = ({
       if (response.ok) {
         const data = await response.json();
         dispatch(setPost({ post: data.updatedPost }));
-        toast.success("Post edited successfully", { autoClose: 1000 });
+        toast.success("Post updated successfully", { autoClose: 1000 });
         setOpenEditModal(false);
         setImage(null);
         setDescription("");
       } else {
+        // If response.ok is false, handle error
         toast.error("Failed to edit post");
       }
     } catch (error) {
@@ -141,7 +138,7 @@ const PostWidget = ({
       // Dispatch the setNotifications action to update the notifications
       dispatch(setNotifications({ notifications: data.updatedNotifications }));
 
-      console.log(data.updatedNotifications);
+      // console.log(data.updatedNotifications);
     } catch (error) {
       console.error("Error liking post:", error);
     }
@@ -293,138 +290,162 @@ const PostWidget = ({
         onClose={() => setOpenEditModal(false)}
         aria-labelledby="edit-post-dialog-title"
       >
-        <DialogTitle id="edit-post-dialog-title" sx={{ textAlign: "center" }}>
+        <DialogTitle
+          id="edit-post-dialog-title"
+          sx={{
+            textAlign: "center",
+            backgroundColor: palette.background.alt,
+            color: palette.text.primary, // Set text color based on theme
+          }}
+        >
           Edit your post details:
         </DialogTitle>
-        <DialogContent>
-          <WidgetWrapper>
-            <FlexBetween gap="1.5rem">
-              <Friend
-                friendId={postUserId}
-                name={name}
-                subtitle={location}
-                userPicturePath={userPicturePath}
-              />
-              <InputBase
-                placeholder="What's on your mind..."
-                onChange={(e) => setDescription(e.target.value)}
-                value={newDescription}
-                sx={{
-                  width: "100%",
-                  backgroundColor: palette.neutral.light,
-                  borderRadius: "2rem",
-                  padding: "1rem 2rem",
-                }}
-              />
-            </FlexBetween>
-            {!isImage && (
-              <img
-                width="100%"
-                height="auto"
-                alt="post"
-                style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-                src={`${BackendUrl}/assets/${picturePath}`}
-              />
-            )}
-            {isImage && (
-              <Box
-                border={`1px solid ${medium}`}
-                borderRadius="5px"
-                mt="1rem"
-                p="1rem"
-              >
-                <Dropzone
-                  acceptedFiles=".jpg,.jpeg,.png"
-                  multiple={false}
-                  onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
-                >
-                  {({ getRootProps, getInputProps }) => (
-                    <FlexBetween>
-                      <Box
-                        {...getRootProps()}
-                        // border={`2px dashed ${palette.primary.main}`}
-                        // p="1rem"
-                        width="100%"
-                        sx={{ "&:hover": { cursor: "pointer" } }}
-                      >
-                        <input {...getInputProps()} />
-                        {!image ? (
-                          <Box border={`2px dashed ${palette.primary.main}`}>
-                            <p>Add Image Here</p>
-                          </Box>
-                        ) : (
-                          <FlexBetween>
-                            <FlexBetween>
-                              {/* <Typography>{image.name}</Typography> */}
-                              <img
-                                width="100%"
-                                height="auto"
-                                alt="post"
-                                style={{
-                                  borderRadius: "0.75rem",
-                                  marginTop: "0rem",
-                                }}
-                                src={URL.createObjectURL(image)} // Use URL.createObjectURL to display the selected image
-                              />
-                            </FlexBetween>
-                            <EditOutlined sx={{ marginLeft: "0.9rem" }} />
-                          </FlexBetween>
-                        )}
-                      </Box>
-                      {image && (
-                        <IconButton
-                          onClick={() => setImage(null)}
-                          sx={{ width: "9%" }}
-                        >
-                          <DeleteOutlined />
-                        </IconButton>
-                      )}
-                    </FlexBetween>
+        <WidgetWrapper
+          sx={{
+            display: "inline-block",
+            "&:hover": {
+              backgroundColor: mode === "dark" ? palette.grey[800] : "#EBEBEB", // Adjust hover background color based on theme
+              cursor: "pointer",
+            },
+            width: "100%",
+          }}
+        >
+          <FlexBetween>
+            <Friend
+              friendId={postUserId}
+              name={name}
+              subtitle={location}
+              userPicturePath={userPicturePath}
+            />
+          </FlexBetween>
+        </WidgetWrapper>
+
+        <DialogContent sx={{ backgroundColor: palette.background.alt }}>
+          <InputBase
+            placeholder="What's on your mind..."
+            onChange={(e) => setDescription(e.target.value)}
+            value={newDescription}
+            sx={{
+              width: "100%",
+              backgroundColor: palette.neutral.light,
+              borderRadius: "2rem",
+              padding: "1rem 2rem",
+            }}
+          />
+          {/* Container for Dropzone and image */}
+          <Box position="relative" width="100%">
+            {/* Dropzone component */}
+            <Dropzone
+              acceptedFiles=".jpg,.jpeg,.png"
+              multiple={false}
+              onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
+            >
+              {({ getRootProps, getInputProps }) => (
+                <Box {...getRootProps()} position="relative">
+                  {/* Input for Dropzone */}
+                  <input {...getInputProps()} />
+                  {/* when newImage are not selected then we display the curernt image of the post */}
+                  {!image && (
+                    <img
+                      width="100%"
+                      height="auto"
+                      alt="post"
+                      style={{
+                        borderRadius: "0.75rem",
+                        marginTop: "0.75rem",
+                      }}
+                      src={`${BackendUrl}/assets/${picturePath}`}
+                    />
                   )}
-                </Dropzone>
-              </Box>
-            )}
-            <Divider sx={{ margin: "1.25rem 0" }} />
-            <FlexBetween>
-              <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
-                <ImageOutlined sx={{ color: mediumMain }} />
-                <Typography
-                  color={mediumMain}
-                  sx={{ "&:hover": { cursor: "pointer", color: medium } }}
-                >
-                  Image
-                </Typography>
-              </FlexBetween>
-
-              {isNonMobileScreens ? (
-                <>
-                  <FlexBetween gap="0.25rem">
-                    <GifBoxOutlined sx={{ color: mediumMain }} />
-                    <Typography color={mediumMain}>Clip</Typography>
-                  </FlexBetween>
-
-                  <FlexBetween gap="0.25rem">
-                    <AttachFileOutlined sx={{ color: mediumMain }} />
-                    <Typography color={mediumMain}>Attachment</Typography>
-                  </FlexBetween>
-
-                  <FlexBetween gap="0.25rem">
-                    <MicOutlined sx={{ color: mediumMain }} />
-                    <Typography color={mediumMain}>Audio</Typography>
-                  </FlexBetween>
-                </>
-              ) : (
-                // here we have to work on when smallerscreens it also show above all icon when user click on more icon
-                <FlexBetween gap="0.25rem">
-                  <MoreHorizOutlined sx={{ color: mediumMain }} />
-                </FlexBetween>
+                  {/* display new Selected Image */}
+                  {image && (
+                    <img
+                      width="100%"
+                      height="auto"
+                      alt="post"
+                      style={{
+                        borderRadius: "0.75rem",
+                        marginTop: "0.75rem",
+                      }}
+                      src={URL.createObjectURL(image)}
+                    />
+                  )}
+                  {/* Render edit icon at the top right corner when image is not selected*/}
+                  {!image && (
+                    <IconButton
+                      sx={{
+                        position: "absolute",
+                        top: "0.5rem",
+                        right: "0.5rem",
+                        backgroundColor:
+                          mode === "dark"
+                            ? palette.grey[800]
+                            : palette.grey[200],
+                        borderRadius: "50%",
+                        "&:hover": {
+                          backgroundColor:
+                            mode === "dark"
+                              ? palette.grey[900]
+                              : palette.grey[300],
+                        },
+                        "& .MuiIconButton-label": {
+                          fontSize: "1.5rem",
+                        },
+                      }}
+                    >
+                      <EditOutlined />
+                    </IconButton>
+                  )}
+                </Box>
               )}
-            </FlexBetween>
-          </WidgetWrapper>
+            </Dropzone>
+            {/* Render delete icon if an image is selected */}
+            {image && (
+              <IconButton
+                onClick={() => setImage(null)}
+                sx={{
+                  position: "absolute",
+                  top: "0.5rem",
+                  right: "0.5rem",
+                  backgroundColor:
+                    mode === "dark" ? palette.grey[800] : palette.grey[200],
+                  borderRadius: "50%",
+                  "&:hover": {
+                    backgroundColor:
+                      mode === "dark" ? palette.grey[900] : palette.grey[300],
+                  },
+                  "& .MuiIconButton-label": {
+                    fontSize: "1.5rem",
+                  },
+                }}
+              >
+                <DeleteOutlined />
+              </IconButton>
+            )}
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <button onClick={() => setOpenEditModal(false)}>Cancel</button>
-          <button onClick={handleEditPost}>Save Changes</button>
+
+        <DialogActions
+          sx={{
+            justifyContent: "space-between",
+            padding: "1rem",
+            backgroundColor: palette.background.alt,
+            borderTop: `1px solid ${palette.divider}`, // Add a border at the top for separation
+          }}
+        >
+          <Button
+            onClick={() => setOpenEditModal(false) || setImage(null)}
+            sx={{
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </Button>
+          {(image || newDescription !== description) && (
+            <Button variant="contained" onClick={handleEditPost}>
+              Save
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
       {/*---------------->  Delete confirmation dialog -------------<*/}

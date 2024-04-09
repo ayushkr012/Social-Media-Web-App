@@ -49,6 +49,7 @@ export default function Navbar() {
   const dark = theme.palette.neutral.dark;
   const background = theme.palette.background.default;
   const primaryLight = theme.palette.primary.light;
+  const mode = useSelector((state) => state.mode);
   const alt = theme.palette.background.alt;
 
   const fullName = `${user.firstName} ${user.lastName}`;
@@ -64,7 +65,10 @@ export default function Navbar() {
           onClick={() => navigate("/home")}
           sx={{
             "&:hover": {
-              color: primaryLight,
+              color:
+                mode == "dark"
+                  ? theme.palette.primary.dark
+                  : theme.palette.primary.dark,
               cursor: "pointer",
             },
           }}

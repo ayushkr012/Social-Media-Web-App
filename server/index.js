@@ -13,7 +13,7 @@ import userRoutes from "./routes/users.js";
 import postRoutes from "./routes/posts.js";
 import connectDB from "./config/db.js";
 import { register } from "./controllers/auth.js";
-import { createPost } from "./controllers/posts.js";
+import { createPost, updatePost } from "./controllers/posts.js"; // Create Post and Update Post
 import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
@@ -54,6 +54,12 @@ const upload = multer({ storage: storage });
 /* ROUTES WITH FILE */
 app.post("/auth/register", upload.single("picture"), register);
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
+app.put(
+  "/posts/:postId/editPost",
+  verifyToken,
+  upload.single("picture"),
+  updatePost
+);
 
 /* ROUTES */
 app.use("/auth", authRoutes);

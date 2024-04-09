@@ -22,6 +22,7 @@ const UserWidget = ({ userId, picturePath }) => {
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
   const BackendUrl = useSelector((state) => state.BackendUrl);
+  const mode = useSelector((state) => state.mode);
   const getUser = async () => {
     const response = await fetch(`${BackendUrl}/users/${userId}`, {
       method: "GET",
@@ -66,7 +67,10 @@ const UserWidget = ({ userId, picturePath }) => {
               fontWeight="500"
               sx={{
                 "&:hover": {
-                  color: palette.primary.light,
+                  color:
+                    mode == "dark"
+                      ? palette.primary.dark
+                      : palette.primary.dark,
                   cursor: "pointer",
                 },
               }}

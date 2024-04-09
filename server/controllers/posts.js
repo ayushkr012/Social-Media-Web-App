@@ -71,7 +71,7 @@ export const getFriendsPosts = async (req, res) => {
   }
 };
 
- /* Update Notification and  impressions and Likes when SomeOne Like the */
+/* Update Notification and  impressions and Likes when SomeOne Like the */
 export const likePost = async (req, res) => {
   try {
     const { id } = req.params; // id of the post
@@ -202,5 +202,35 @@ export const deletePost = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Internal Server Error!" });
+  }
+};
+
+/* UPDATE POST */
+
+export const updatePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { description, picturePath } = req.body;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+    }
+    if (description) post.description = description;
+
+    if (picturePath) post.picturePath = picturePath;
+
+    const updatedPost = await post.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Post updated successfully!",
+      updatedPost: updatedPost,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };

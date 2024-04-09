@@ -39,6 +39,7 @@ const MyPostWidget = ({ picturePath }) => {
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
   const BackendUrl = useSelector((state) => state.BackendUrl);
+  const mode = useSelector((state) => state.mode);
 
   const handlePost = async () => {
     const formData = new FormData();
@@ -178,10 +179,18 @@ const MyPostWidget = ({ picturePath }) => {
         <Button
           // disabled={!post} // we keep as it optional user can post their psot without descerption
           onClick={handlePost}
+          // sx={{
+          //   color: palette.background.alt,
+          //   backgroundColor: palette.primary.main,
+          //   borderRadius: "3rem",
+          // }}
           sx={{
-            color: palette.background.alt,
-            backgroundColor: palette.primary.main,
+            "&:hover": {
+              color:
+                mode == "dark" ? palette.primary.dark : palette.primary.main,
+            },
             borderRadius: "3rem",
+            backgroundColor: palette.primary.light,
           }}
         >
           POST

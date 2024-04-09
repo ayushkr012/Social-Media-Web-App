@@ -24,6 +24,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const primaryDark = palette.primary.dark;
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
+  const mode = useSelector((state) => state.mode);
 
   // check if the friend is in the user's friends list so we add and remove friend
   const isFriend =
@@ -76,7 +77,8 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
             fontWeight="500"
             sx={{
               "&:hover": {
-                color: palette.primary.light,
+                color:
+                  mode == "dark" ? palette.primary.dark : palette.primary.dark,
                 cursor: "pointer",
               },
             }}
