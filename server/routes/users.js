@@ -7,6 +7,7 @@ import {
   profileView,
   getNotification,
   updateNotificationStatus,
+  updateUser,
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -16,7 +17,7 @@ const userRoutes = express.Router();
 userRoutes.get("/:id", verifyToken, getUser);
 userRoutes.get("/:id/friends", verifyToken, getUserFriends);
 
-/*UPDATE*/
+/*Add or Remove Friend*/
 userRoutes.patch("/:id/:friendId", verifyToken, addRemoveFriend);
 
 /* Update Notification and profileViewCount when SomeOne View Profile  */
@@ -34,5 +35,8 @@ userRoutes.put(
 
 /*Feedback*/
 userRoutes.post("/feedback", verifyToken, feedback);
+
+/*Update User Profile*/
+userRoutes.put("/:userId/edituser", verifyToken, updateUser);
 
 export default userRoutes;

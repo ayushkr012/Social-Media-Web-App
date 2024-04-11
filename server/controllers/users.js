@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import nodemailer from "nodemailer";
 import UserFeedBack from "../models/UserFeedBack.js";
+import Post from "../models/Post.js";
 
 /* Get User details  */
 
@@ -429,5 +430,70 @@ export const updateNotificationStatus = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(404).json({ message: err.message });
+  }
+};
+
+/* Update User Profile */
+export const updateUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      firstName,
+      lastName,
+      location,
+      occupation,
+      twitterProfile,
+      linkedinProfile,
+    } = req.body;
+    console.log(
+      "firstName",
+      firstName,
+      "lastName",
+      lastName,
+      "location",
+      location,
+      "occupation",
+      occupation,
+      "twitterProfile",
+      twitterProfile,
+      "linkedinProfile",
+      linkedinProfile
+    );
+    const user = await User.findById(userId);
+
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.location = location;
+    user.occupation = occupation;
+    user.twitterProfile = twitterProfile;
+    user.linkedinProfile = linkedinProfile;
+    const updatedUser = await user.save();
+
+    const feedback = await UserFeedBack.findOne({email:user.email});
+    feedback.firstName = firstName;
+    feedback.lastName = lastName;
+    await feedback.save();
+
+    const posts = await Post.find({ userId });
+    const updatePromises = posts.map(async (post) => {
+      post.firstName = firstName;
+      post.lastName = lastName;
+      post.location = location;
+      return post.save();
+    });
+    await Promise.all(updatePromises);
+
+    res.status(200).json({
+      success: true,
+      message: "User profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message,
+    });
   }
 };

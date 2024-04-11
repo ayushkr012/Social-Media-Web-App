@@ -10,6 +10,7 @@ const UserChatFreind = ({ friendId, name, subtitle, userPicturePath }) => {
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
+  const mode = useSelector((state) => state.mode);
 
   return (
     <FlexBetween
@@ -32,7 +33,8 @@ const UserChatFreind = ({ friendId, name, subtitle, userPicturePath }) => {
             fontWeight="500"
             sx={{
               "&:hover": {
-                color: palette.primary.light,
+                color:
+                  mode == "light" ? palette.text.primary : palette.text.primary,
                 cursor: "pointer",
               },
             }}

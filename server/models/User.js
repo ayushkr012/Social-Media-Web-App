@@ -70,6 +70,14 @@ const userSchema = new mongoose.Schema(
     viewedProfile: Number,
     impressions: Number,
     lastSeen: Date,
+    linkedinProfile: {
+      type: String,
+      default: "",
+    },
+    twitterProfile: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

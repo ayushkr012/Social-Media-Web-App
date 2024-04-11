@@ -12,6 +12,7 @@ import {
   Telegram,
   Twitter,
   Instagram,
+  CloseOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -27,6 +28,7 @@ import {
   DialogContentText,
   DialogTitle,
   useMediaQuery,
+  Modal,
 } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
@@ -289,17 +291,33 @@ const PostWidget = ({
         open={openEditModal}
         onClose={() => setOpenEditModal(false)}
         aria-labelledby="edit-post-dialog-title"
+        PaperProps={{
+          sx: {
+            borderRadius: "2.5rem",
+          },
+        }}
       >
         <DialogTitle
           id="edit-post-dialog-title"
           sx={{
-            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             backgroundColor: palette.background.alt,
-            color: palette.text.primary, // Set text color based on theme
+            color: palette.text.primary,
+            fontSize: "1.2rem",
+            fontWeight: "bold",
+            padding: "1.5rem 0", // Adjust padding as needed
           }}
         >
-          Edit your post details:
+          Update Post
         </DialogTitle>
+        <Divider
+          sx={{
+            backgroundColor: palette.text.primary,
+            borderTop: `1px solid ${palette.divider}`, // Add a border at the top for separation
+          }}
+        />
         <WidgetWrapper
           sx={{
             display: "inline-block",
@@ -319,7 +337,12 @@ const PostWidget = ({
             />
           </FlexBetween>
         </WidgetWrapper>
-
+        <Divider
+          sx={{
+            backgroundColor: palette.text.primary,
+            borderTop: `1px solid ${palette.divider}`, // Add a border at the top for separation
+          }}
+        />
         <DialogContent sx={{ backgroundColor: palette.background.alt }}>
           <InputBase
             placeholder="What's on your mind..."
@@ -431,6 +454,7 @@ const PostWidget = ({
             padding: "1rem",
             backgroundColor: palette.background.alt,
             borderTop: `1px solid ${palette.divider}`, // Add a border at the top for separation
+           
           }}
         >
           <Button

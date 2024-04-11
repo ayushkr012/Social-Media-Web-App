@@ -78,7 +78,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
             sx={{
               "&:hover": {
                 color:
-                  mode == "dark" ? palette.primary.dark : palette.primary.dark,
+                  mode == "dark" ? palette.text.primary : palette.text.primary,
                 cursor: "pointer",
               },
             }}

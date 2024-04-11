@@ -47,13 +47,15 @@ const NotificationList = ({
   };
 
   return (
-    <FlexBetween
-    >
+    <FlexBetween>
       <FlexBetween gap="1rem" onClick={handleClick}>
         <UserImage image={userPicturePath} size="55px" />
         <Box>
           <Typography
-            sx={{ color: mode == "dark" ? "white" : "dark" }}
+            sx={{
+              color:
+                mode == "dark" ? palette.text.primary : palette.text.primary,
+            }}
             variant="h6"
             fontWeight="450"
           >
@@ -61,7 +63,7 @@ const NotificationList = ({
           </Typography>
         </Box>
         <Typography
-          sx={{ color: mode == "dark" ? "white" : "dark" }}
+          sx={{ color: mode == "dark" ? main : "dark" }}
           fontSize="0.75rem"
         >
           {message}
