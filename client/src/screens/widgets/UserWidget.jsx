@@ -13,10 +13,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EditAccountModal from "./EditAccountModal";
-import { setUser } from "state";
+import { setUser, setPosts } from "state";
 
 // props data came from homePage/index.jsx and profilePage/index.jsx
-const UserWidget = ({ userId, picturePath }) => {
+const UserWidget = ({ userId, picturePath, isProfile = false }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State to manage modal open/close
   const { palette } = useTheme();
   const navigate = useNavigate();
@@ -25,9 +25,35 @@ const UserWidget = ({ userId, picturePath }) => {
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
   const user = useSelector((state) => state.user);
+  const LoggedInUser = useSelector((state) => state.user?._id);
   const BackendUrl = useSelector((state) => state.BackendUrl);
   const mode = useSelector((state) => state.mode);
   const dispatch = useDispatch();
+  const [ProfileUser, setProfileUser] = useState(null);
+
+  // let suppose we get the other user profile  then we have to fetch the data of that user
+  const getUserData = async () => {
+    try {
+      const response = await fetch(`${BackendUrl}/users/${userId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const user = await response.json();
+
+      setProfileUser(user);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  useEffect(() => {
+    getUserData();
+  }, []);
+
+  // Function to handle opening the edit account modal user can edit their own account
+
+  const isOwnProfile = LoggedInUser === userId; // we allow only the user to edit their own profile
 
   const handleEditAccount = () => {
     setIsEditModalOpen(true);
@@ -52,9 +78,16 @@ const UserWidget = ({ userId, picturePath }) => {
 
       const json = await response.json();
       if (json.success) {
-        // set the updated User object in the state
-        dispatch(setUser({ user: json.user }));
+        setProfileUser(editedUser); // set the updated user object so it reflect changes in real time
+
+        // if the user is on their profile page then update the posts in the state
+        if (isProfile) {
+          dispatch(setPosts({ posts: json.userallposts }));
+        } else {
+          dispatch(setPosts({ posts: json.allfeedposts }));
+        }
         toast.success(json.message);
+
         setIsEditModalOpen(false);
       } else {
         console.log("Error saving edited user:", json.message);
@@ -67,7 +100,7 @@ const UserWidget = ({ userId, picturePath }) => {
     }
   };
 
-  if (!user) {
+  if (!ProfileUser) {
     return null;
   }
   // desturcture items from the user object
@@ -81,7 +114,7 @@ const UserWidget = ({ userId, picturePath }) => {
     friends,
     linkedinProfile,
     twitterProfile,
-  } = user;
+  } = ProfileUser;
 
   return (
     <WidgetWrapper>
@@ -113,9 +146,11 @@ const UserWidget = ({ userId, picturePath }) => {
             {/* <Typography color={medium}>{friends.length} friends</Typography> */}
           </Box>
         </FlexBetween>
-        <Button onClick={handleEditAccount} sx={{ borderRadius: "10px" }}>
-          <ManageAccountsOutlined />
-        </Button>
+        {isOwnProfile && (
+          <Button onClick={handleEditAccount} sx={{ borderRadius: "10px" }}>
+            <ManageAccountsOutlined />
+          </Button>
+        )}
       </FlexBetween>
 
       <Divider />
@@ -173,11 +208,15 @@ const UserWidget = ({ userId, picturePath }) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Typography color={medium}>{linkedinProfile}</Typography>
+                <Typography
+                  sx={{ color: mode == "dark" ? "lightgreen" : "blue" }}
+                >
+                  {linkedinProfile}
+                </Typography>
               </a>
             </Box>
           </FlexBetween>
-          <EditOutlined sx={{ color: main }} />
+          {/* <EditOutlined sx={{ color: main }} /> */}
         </FlexBetween>
 
         {/* Twitter Profile */}
@@ -193,11 +232,15 @@ const UserWidget = ({ userId, picturePath }) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Typography color={medium}>{twitterProfile}</Typography>
+                <Typography
+                  sx={{ color: mode == "dark" ? "lightgreen" : "blue" }}
+                >
+                  {twitterProfile}
+                </Typography>
               </a>
             </Box>
           </FlexBetween>
-          <EditOutlined sx={{ color: main }} />
+          {/* <EditOutlined sx={{ color: main }} /> */}
         </FlexBetween>
       </Box>
       {isEditModalOpen && (

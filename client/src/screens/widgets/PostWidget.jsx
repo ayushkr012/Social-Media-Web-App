@@ -80,7 +80,7 @@ const PostWidget = ({
   const medium = palette.neutral.medium;
   // console.log(loggedInUserId);
 
-  const isOwnPost = loggedInUserId === postUserId || "c0baccb754e2cf";
+  const isOwnPost = loggedInUserId === postUserId || loggedInUserId=="c0baccb754e2cf";
 
   /* -----------------------------> Edit Post Implementation --------------------------< */
   const handleEditPost = async () => {

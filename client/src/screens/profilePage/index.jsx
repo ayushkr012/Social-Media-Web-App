@@ -8,7 +8,6 @@ import FriendListWidget from "screens/widgets/FriendListWidget";
 import PostsWidget from "screens/widgets/PostsWidget";
 import UserWidget from "screens/widgets/UserWidget";
 
-
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const { userId } = useParams(); // grab the userId from the url
@@ -48,7 +47,11 @@ const ProfilePage = () => {
         }}
       >
         <Box flexBasis={isNonMobileScreens ? "60%" : undefined}>
-          <UserWidget userId={userId} picturePath={user.picturePath} />
+          <UserWidget
+            userId={userId}
+            picturePath={user.picturePath}
+            isProfile
+          />
           <Box m="2rem 0" />
           <PostsWidget userId={userId} isProfile />
         </Box>

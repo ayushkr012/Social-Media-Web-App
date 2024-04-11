@@ -459,6 +459,7 @@ export const updateUser = async (req, res) => {
       "linkedinProfile",
       linkedinProfile
     );
+    // update user in user schema
     const user = await User.findById(userId);
 
     user.firstName = firstName;
@@ -467,13 +468,15 @@ export const updateUser = async (req, res) => {
     user.occupation = occupation;
     user.twitterProfile = twitterProfile;
     user.linkedinProfile = linkedinProfile;
-    const updatedUser = await user.save();
+    await user.save();
 
-    const feedback = await UserFeedBack.findOne({email:user.email});
+    // update  user details in feedback schema
+    const feedback = await UserFeedBack.findOne({ email: user.email });
     feedback.firstName = firstName;
     feedback.lastName = lastName;
     await feedback.save();
 
+    // update user details in post schema
     const posts = await Post.find({ userId });
     const updatePromises = posts.map(async (post) => {
       post.firstName = firstName;
@@ -483,10 +486,20 @@ export const updateUser = async (req, res) => {
     });
     await Promise.all(updatePromises);
 
+    // Return all posts after after updating the user data so it refelct in real time
+    // when user is home page
+    const feedposts = await Post.find().sort({ _id: -1 });
+    const allfeedposts = feedposts.map((post) => post.toObject()); // Convert each post to object
+
+    // when user is on their own profile page
+    const userposts = await Post.find({ userId }).sort({ _id: -1 }); // Return posts of a particular user
+    const userallposts = userposts.map((post) => post.toObject()); // Convert each post to object
+
     res.status(200).json({
       success: true,
       message: "User profile updated successfully",
-      user: updatedUser,
+      allfeedposts: allfeedposts,
+      userallposts: userallposts,
     });
   } catch (err) {
     console.log(err);
