@@ -12,7 +12,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import EditAccountModal from "./EditAccountModal";
+import EditAccountModal from "../../modal/EditAccountModal";
 import { setUser, setPosts } from "state";
 
 // props data came from homePage/index.jsx and profilePage/index.jsx
@@ -209,7 +209,7 @@ const UserWidget = ({ userId, picturePath, isProfile = false }) => {
                 rel="noopener noreferrer"
               >
                 <Typography
-                  sx={{ color: mode == "dark" ? "lightgreen" : "blue" }}
+                  sx={{ color: mode == "dark" ? palette.primary.dark : "blue" }}
                 >
                   {linkedinProfile}
                 </Typography>
@@ -233,7 +233,7 @@ const UserWidget = ({ userId, picturePath, isProfile = false }) => {
                 rel="noopener noreferrer"
               >
                 <Typography
-                  sx={{ color: mode == "dark" ? "lightgreen" : "blue" }}
+                  sx={{ color: mode == "dark" ? palette.primary.dark : "blue" }}
                 >
                   {twitterProfile}
                 </Typography>

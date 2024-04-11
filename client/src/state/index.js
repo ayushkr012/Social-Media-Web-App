@@ -68,6 +68,6 @@ export const {
   setPost,
   setChatFriend,
   setNotifications,
-  setUser
+  setUser,
 } = authSlice.actions;
 export default authSlice.reducer;

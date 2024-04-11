@@ -151,7 +151,6 @@ const MyPostWidget = ({ picturePath }) => {
             Image
           </Typography>
         </FlexBetween>
-
         {isNonMobileScreens ? (
           <>
             <FlexBetween gap="0.25rem">
@@ -177,17 +176,12 @@ const MyPostWidget = ({ picturePath }) => {
         )}
 
         <Button
-          // disabled={!post} // we keep as it optional user can post their psot without descerption
+          disabled={!description} // we keep as it optional user can post their post without description
           onClick={handlePost}
-          // sx={{
-          //   color: palette.background.alt,
-          //   backgroundColor: palette.primary.main,
-          //   borderRadius: "3rem",
-          // }}
           sx={{
             "&:hover": {
               color:
-                mode == "dark" ? palette.primary.dark : palette.primary.main,
+                mode === "dark" ? palette.primary.dark : palette.primary.main,
             },
             borderRadius: "3rem",
             backgroundColor: palette.primary.light,
