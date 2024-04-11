@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, Divider } from "@mui/material";
 import NotificationList from "components/NotificationList";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect } from "react";
@@ -9,6 +9,7 @@ const NotificationWidget = ({ userId }) => {
   const { palette } = useTheme();
   const notifications = useSelector((state) => state.notifications);
   console.log(notifications);
+  const mode = useSelector((state) => state.mode);
 
   return (
     <WidgetWrapper
@@ -25,17 +26,35 @@ const NotificationWidget = ({ userId }) => {
       <Box display="flex" flexDirection="column" gap="2rem">
         {Array.isArray(notifications) &&
           notifications.map((user, index) => (
-            <NotificationList // it is component : path client/src/components/NotificationList.jsx
-              key={`${user.userId}_${index}`}
-              friendId={user.userId}
-              name={`${user.firstName} ${user.lastName}`}
-              subtitle={user.occupation}
-              userPicturePath={user.picturePath}
-              message={user.message}
-              time={user.time}
-              read={user.read}
-            />
+            <Box
+              sx={{
+                "&:hover": {
+                  backgroundColor: mode == "dark" ? "#333333" : "#EBEBEA",
+                  cursor: "pointer",
+                },
+              }}
+            >
+              <NotificationList // it is component : path client/src/components/NotificationList.jsx
+                key={`${user.userId}_${index}`}
+                friendId={user.userId}
+                name={`${user.firstName} ${user.lastName}`}
+                subtitle={user.occupation}
+                userPicturePath={user.picturePath}
+                message={user.message}
+                time={user.time}
+                read={user.read}
+              />
+              <Divider
+                sx={{
+                  color:
+                    mode == "dark"
+                      ? `${palette.primary.main} ${palette.background.default}`
+                      : "light",
+                }}
+              />
+            </Box>
           ))}
+
         {(!notifications || notifications.length === 0) && (
           <Typography
             color={palette.neutral.medium}

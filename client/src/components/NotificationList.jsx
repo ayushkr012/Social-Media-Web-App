@@ -19,11 +19,9 @@ const NotificationList = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state) => state.token);
-  const theme = useTheme();
   const { palette } = useTheme();
-  const primaryLight = palette.primary.light;
-  const primaryDark = palette.primary.dark;
   const main = palette.neutral.main;
+  const mode = useSelector((state) => state.mode);
   const medium = palette.neutral.medium;
   const mediumMain = palette.neutral.mediumMain;
   const BackendUrl = useSelector((state) => state.BackendUrl);
@@ -50,21 +48,22 @@ const NotificationList = ({
 
   return (
     <FlexBetween
-      sx={{
-        "&:hover": {
-          backgroundColor: theme.palette.mode == "dark" ? "white" : "#EBEBEA",
-          cursor: "pointer",
-        },
-      }}
     >
       <FlexBetween gap="1rem" onClick={handleClick}>
         <UserImage image={userPicturePath} size="55px" />
         <Box>
-          <Typography sx={{ color: mediumMain }} variant="h6" fontWeight="450">
+          <Typography
+            sx={{ color: mode == "dark" ? "white" : "dark" }}
+            variant="h6"
+            fontWeight="450"
+          >
             {name}
           </Typography>
         </Box>
-        <Typography color={medium} fontSize="0.75rem">
+        <Typography
+          sx={{ color: mode == "dark" ? "white" : "dark" }}
+          fontSize="0.75rem"
+        >
           {message}
         </Typography>
       </FlexBetween>

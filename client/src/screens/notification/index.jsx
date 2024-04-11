@@ -15,21 +15,23 @@ const Notification = () => {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const BackendUrl = useSelector((state) => state.BackendUrl);
+  const mode = useSelector((state) => state.mode);
 
-  // useEffect(() => {
-  //   const getNotification = async () => {
-  //     const response = await fetch(`${BackendUrl}/users/notification/${_id}`, {
-  //       method: "GET",
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //     const data = await response.json();
-  //     // console.log(notifications);
-  //     dispatch(setNotifications({ notifications: data.updatedNotifications }));
-  //   };
+  useEffect(() => {
+    const getNotification = async () => {
+      const response = await fetch(`${BackendUrl}/users/notification/${_id}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      // console.log(notifications);
+      dispatch(setNotifications({ notifications: data.updatedNotifications }));
+    };
 
-  //   getNotification();
-  // }, []);
+    getNotification();
+  }, []);
 
+  // middle up section part of notification
   const BoxStyle = {
     padding: "0.8rem",
     borderRadius: "1rem",
@@ -40,7 +42,8 @@ const Notification = () => {
   const BoxHoverStyle = {
     ...BoxStyle,
     "&:hover": {
-      backgroundColor: "lightgray", // Change to appropriate color for light mode
+      backgroundColor:
+        mode == "dark" ? palette.primary.dark : palette.primary.light,
       cursor: "pointer",
       color: "black",
     },
@@ -48,7 +51,7 @@ const Notification = () => {
 
   const BoxActiveStyle = {
     ...BoxStyle,
-    backgroundColor: "darkgreen", // Change to appropriate color for active state
+    backgroundColor: "darkgreen",
     color: "white",
   };
   const MenuItem = ({ text, isActive, onClick }) => {

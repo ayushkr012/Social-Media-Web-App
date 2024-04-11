@@ -7,6 +7,8 @@ import { Formik } from "formik";
 import * as yup from "yup"; // yup is a JavaScript library for object schema validation.
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Loading from "components/Loading";
+import WidgetWrapper from "components/WidgetWrapper";
 
 const feedbackSchema = yup.object().shape({
   feedback: yup.string().required("Feedback is required"),
@@ -19,6 +21,7 @@ const initialValuesFeedback = {
 const FeedbackForm = () => {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const { firstName, lastName, email } = useSelector((state) => state.user);
+  const [isloading, setisLoading] = useState(false);
   const BackendUrl = useSelector((state) => state.BackendUrl);
   const token = useSelector((state) => state.token);
   const { palette } = useTheme();
@@ -26,6 +29,7 @@ const FeedbackForm = () => {
   console.log(BackendUrl);
 
   const sendFeedback = async (values, onSubmitProps) => {
+    setisLoading(true);
     const responce = await fetch(`${BackendUrl}/users/feedback`, {
       method: "POST",
       headers: {
@@ -41,15 +45,13 @@ const FeedbackForm = () => {
     });
     const json = await responce.json();
     if (json.success) {
-      // Set success message
       toast.success(json.message);
+      setisLoading(false);
 
-      // after 2 second it will redirect to login page
       setTimeout(() => {
         navigate("/home");
-      }, 2500);
+      }, 2000);
     } else {
-      // Set error message
       toast.error(json.message);
     }
   };
@@ -94,20 +96,26 @@ const FeedbackForm = () => {
               fullWidth
               sx={{ mt: 2 }}
             />
-            <Button
-              fullWidth
-              type="submit"
-              disabled={feedbackSent}
-              sx={{
-                mt: 2,
-                p: "1rem",
-                backgroundColor: palette.primary.main,
-                color: palette.background.alt,
-                "&:hover": { color: palette.primary.main },
-              }}
-            >
-              {feedbackSent ? "Feedback Sent" : "Send Feedback"}
-            </Button>
+            {isloading ? (
+              <WidgetWrapper>
+                <Loading />
+              </WidgetWrapper>
+            ) : (
+              <Button
+                fullWidth
+                type="submit"
+                disabled={feedbackSent}
+                sx={{
+                  mt: 2,
+                  p: "1rem",
+                  backgroundColor: palette.primary.main,
+                  color: palette.background.alt,
+                  "&:hover": { color: palette.primary.main },
+                }}
+              >
+                {feedbackSent ? "Feedback Sent" : "Send Feedback"}
+              </Button>
+            )}
           </Box>
           <ToastContainer />
         </form>

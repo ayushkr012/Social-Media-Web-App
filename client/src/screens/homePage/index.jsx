@@ -50,6 +50,7 @@ const HomePage = () => {
         display={isNonMobileScreens ? "flex" : "block"}
         gap="0.5rem"
         justifyContent="space-between"
+        // className="flex-1 h-full px-4 flex flex-col gap-6 overflow-y-auto rounded-lg"
         sx={
           // isNonMobileScreens && {
           {
