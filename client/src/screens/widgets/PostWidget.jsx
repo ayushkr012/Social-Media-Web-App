@@ -69,10 +69,12 @@ const PostWidget = ({
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user?._id);
   const BackendUrl = useSelector((state) => state.BackendUrl);
-  // console.log("Likes:", likes.length);
+  // console.log("Likes:", Object.keys(likes).length);
 
-  const isLiked = likes && loggedInUserId && Boolean(likes[loggedInUserId]);
-  const likeCount = likes ? Object.keys(likes).length : 0;
+  const isLiked = loggedInUserId ? Boolean(likes[loggedInUserId]) : false;
+
+  // console.log("isLiked:", isLiked);
+  const likeCount = Object.keys(likes).length;
 
   const main = palette?.neutral?.main;
   const primary = palette?.primary?.main;
@@ -80,7 +82,8 @@ const PostWidget = ({
   const medium = palette.neutral.medium;
   // console.log(loggedInUserId);
 
-  const isOwnPost = loggedInUserId === postUserId || loggedInUserId=="c0baccb754e2cf";
+  const isOwnPost =
+    loggedInUserId === postUserId || loggedInUserId == "c0baccb754e2cf";
 
   /* -----------------------------> Edit Post Implementation --------------------------< */
   const handleEditPost = async () => {
@@ -132,7 +135,7 @@ const PostWidget = ({
       });
       const data = await response.json();
 
-      // console.log("Data received from server:", data); // Log the data received from the server
+      console.log("Data received from server:", data); // Log the data received from the server
 
       // Dispatch the setPost action to update the liked post
       dispatch(setPost({ post: data.updatedPost }));
@@ -454,7 +457,6 @@ const PostWidget = ({
             padding: "1rem",
             backgroundColor: palette.background.alt,
             borderTop: `1px solid ${palette.divider}`, // Add a border at the top for separation
-           
           }}
         >
           <Button

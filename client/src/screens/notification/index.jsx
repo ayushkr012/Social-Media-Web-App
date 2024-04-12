@@ -63,6 +63,8 @@ const Notification = () => {
       </Box>
     );
   };
+  const paragraphColor =
+    mode === "dark" ? palette.text.secondary : palette.text.primary;
 
   return (
     <Box>
@@ -190,8 +192,64 @@ const Notification = () => {
         <Box
           flexBasis={isNonMobileScreens ? "22%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
+          display="flex"
+          justifyContent="center"
         >
-          {/* <NotificationWidget userId={_id} /> */}
+          <Box style={{ textAlign: "center" }}>
+            <Typography
+              color="primary"
+              sx={{
+                "&:hover": {
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                },
+              }}
+            >
+              <p style={{ color: paragraphColor }}>
+                About | Accessibility | Help Center
+              </p>
+            </Typography>
+
+            <Typography
+              color="primary"
+              sx={{
+                "&:hover": {
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                },
+              }}
+            >
+              <p style={{ color: paragraphColor }}>
+                Privacy & Terms | Ad Choices | Advertising
+              </p>
+            </Typography>
+            <Typography
+              color="primary"
+              sx={{
+                "&:hover": {
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                },
+              }}
+            >
+              <p style={{ color: paragraphColor }}>
+                Business Services | Get the Connectify app
+              </p>
+            </Typography>
+            <Typography
+              color="primary"
+              sx={{
+                "&:hover": {
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                },
+              }}
+            >
+              <p style={{ color: paragraphColor }}>
+                Connectify Corporation © 2024
+              </p>
+            </Typography>
+          </Box>
           <Box m="2rem 0" />
         </Box>
       </Box>
