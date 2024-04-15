@@ -470,11 +470,13 @@ export const updateUser = async (req, res) => {
     user.linkedinProfile = linkedinProfile;
     await user.save();
 
-    // update  user details in feedback schema
+    // update  user details in feedback schema if user has given feedback at least one time
     const feedback = await UserFeedBack.findOne({ email: user.email });
-    feedback.firstName = firstName;
-    feedback.lastName = lastName;
-    await feedback.save();
+    if (feedback) {
+      feedback.firstName = firstName;
+      feedback.lastName = lastName;
+      await feedback.save();
+    }
 
     // update user details in post schema
     const posts = await Post.find({ userId });
@@ -488,12 +490,10 @@ export const updateUser = async (req, res) => {
 
     // Return all posts after after updating the user data so it refelct in real time
     // when user is home page
-    const feedposts = await Post.find().sort({ _id: -1 });
-    const allfeedposts = feedposts.map((post) => post.toObject()); // Convert each post to object
+    const allfeedposts = await Post.find().sort({ _id: -1 });
 
     // when user is on their own profile page
-    const userposts = await Post.find({ userId }).sort({ _id: -1 }); // Return posts of a particular user
-    const userallposts = userposts.map((post) => post.toObject()); // Convert each post to object
+    const userallposts = await Post.find({ userId }).sort({ _id: -1 }); // Return posts of a particular user
 
     res.status(200).json({
       success: true,

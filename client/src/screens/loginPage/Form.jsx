@@ -160,7 +160,7 @@ const Form = () => {
       toast.error("Please upload a picture");
     }
 
-    formData.append("picturePath", values.picture.name);
+    // formData.append("picturePath", values.picture.name);
 
     const savedUserResponse = await fetch(`${BackendUrl}/auth/register`, {
       method: "POST",

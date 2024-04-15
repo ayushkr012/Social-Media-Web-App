@@ -15,15 +15,22 @@ import connectDB from "./config/db.js";
 import { register } from "./controllers/auth.js";
 import { createPost, updatePost } from "./controllers/posts.js"; // Create Post and Update Post
 import { verifyToken } from "./middleware/auth.js";
+import uploadImage from "./controllers/imageController.js";
+import { upload } from "./utils/multer.js";
+
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
+
 dotenv.config();
 const app = express();
 
 /* CONFIGURATION  when we use type=module */
+
+// these below 3 lines are required for only advertisement widget and linkedin and twitterIcon
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 app.use(cookieParser());
 app.use(express.json());
@@ -33,31 +40,58 @@ app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
-app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 /* DataBase Connection */
 const PORT = process.env.PORT || 5001;
 connectDB();
 
-/* FILE STORAGE */
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/assets");
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
-});
+// /* FILE STORAGE */
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "public/assets");
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, file.originalname);
+//   },
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 /* ROUTES WITH FILE */
-app.post("/auth/register", upload.single("picture"), register);
-app.post("/posts", verifyToken, upload.single("picture"), createPost);
+
+/* --------------------------> Use Cloudinary for image store <-------------------------------*/
+
+/*Register */
+app.post("/auth/register", upload.single("picture"), uploadImage, register);
+
+
+/*Create Post */
+app.post(
+  "/posts",
+  verifyToken,
+  upload.single("picture"),
+  uploadImage,
+  createPost
+);
+
+/*Update Post */
 app.put(
   "/posts/:postId/editPost",
   verifyToken,
-  upload.single("picture"),
+  (req, res, next) => {
+    // Check if picture exists in request body
+    if (req.body.picture) {
+      // If picture exists, execute upload.single("picture") and uploadImage middleware
+      upload.single("picture")(req, res, (err) => {
+        if (err) {
+          return res.status(400).json({ error: "Failed to upload picture." });
+        }
+        next(); // Move to the next middleware
+      });
+    } else {
+      next(); // Move to the next middleware directly
+    }
+  },
   updatePost
 );
 

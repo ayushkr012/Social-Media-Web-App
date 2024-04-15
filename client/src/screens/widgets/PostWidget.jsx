@@ -91,7 +91,6 @@ const PostWidget = ({
     formData.append("description", newDescription);
     if (image) {
       formData.append("picture", image);
-      formData.append("picturePath", image.name);
     }
 
     try {
@@ -248,7 +247,7 @@ const PostWidget = ({
           height="auto"
           alt="post"
           style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          src={`${BackendUrl}/assets/${picturePath}`}
+          src={picturePath}
         />
       )}
       {/*  -----------------------> Like, Comment, Share  and edit Section ----------------------------< */}
@@ -380,7 +379,7 @@ const PostWidget = ({
                         borderRadius: "0.75rem",
                         marginTop: "0.75rem",
                       }}
-                      src={`${BackendUrl}/assets/${picturePath}`}
+                      src={picturePath}
                     />
                   )}
                   {/* display new Selected Image */}

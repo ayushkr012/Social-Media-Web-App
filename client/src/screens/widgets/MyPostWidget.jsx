@@ -47,7 +47,6 @@ const MyPostWidget = ({ picturePath }) => {
     formData.append("description", description);
     if (image) {
       formData.append("picture", image);
-      formData.append("picturePath", image.name);
     }
 
     const response = await fetch(`${BackendUrl}/posts`, {
@@ -58,15 +57,11 @@ const MyPostWidget = ({ picturePath }) => {
     const posts = await response.json();
 
     toast.success("Post created successfully", { autoClose: 1000 });
-    // setTimeout(() => {
     dispatch(setPosts({ posts }));
-    // }, 300);
-
-    // after the api call we reset the state
-    // setTimeout(() => {
+    // after successfull post we reset the image and description
     setImage(null);
+    setIsImage(false);
     setDescription("");
-    // }, 300);
   };
 
   return (
@@ -176,7 +171,7 @@ const MyPostWidget = ({ picturePath }) => {
         )}
 
         <Button
-          disabled={!description} // we keep as it optional user can post their post without description
+          disabled={!description && !image} // we keep as it optional user can post their post without description
           onClick={handlePost}
           sx={{
             "&:hover": {

@@ -4,8 +4,9 @@ import User from "../models/User.js";
 /* CREATE POST */
 export const createPost = async (req, res) => {
   try {
-    const { userId, description, picturePath } = req.body;
-
+    const { userId, description } = req.body;
+    const picturePath = req.imageUrl; // after the image upload in cloudinary we get the image url from the request object
+    console.log("picturePath", picturePath);
     const user = await User.findById(userId);
 
     const newPost = new Post({
@@ -194,7 +195,8 @@ export const deletePost = async (req, res) => {
 export const updatePost = async (req, res) => {
   try {
     const { postId } = req.params;
-    const { description, picturePath } = req.body;
+    const { description } = req.body;
+    const picturePath = req.imageUrl;
 
     const post = await Post.findById(postId);
     if (!post) {
