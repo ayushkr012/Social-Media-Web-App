@@ -64,7 +64,6 @@ connectDB();
 /*Register */
 app.post("/auth/register", upload.single("picture"), uploadImage, register);
 
-
 /*Create Post */
 app.post(
   "/posts",
@@ -78,11 +77,12 @@ app.post(
 app.put(
   "/posts/:postId/editPost",
   verifyToken,
+  upload.single("picture"), // Attach upload middleware directly to the route
   (req, res, next) => {
-    // Check if picture exists in request body
-    if (req.body.picture) {
-      // If picture exists, execute upload.single("picture") and uploadImage middleware
-      upload.single("picture")(req, res, (err) => {
+    // Check if picture exists in request file
+    if (req.file) {
+      // If picture exists, execute uploadImage middleware
+      uploadImage(req, res, (err) => {
         if (err) {
           return res.status(400).json({ error: "Failed to upload picture." });
         }

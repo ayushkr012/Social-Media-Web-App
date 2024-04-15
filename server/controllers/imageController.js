@@ -4,24 +4,6 @@ import { AppError } from "../utils/appError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import fs from "fs"; // Import the fs module
 
-// const uploadImage = catchAsync(async (req, res, next) => {
-//   let cloudinaryResponse;
-
-//   if (req.file) {
-//     cloudinaryResponse = await cloudinary.uploader.upload(req.file.path, {
-//       upload_preset: "cloudinary_trials",
-//     });
-//   } else {
-//     return next(new AppError("Please provide a file", 400));
-//   }
-
-//   res.status(200).json({
-//     status: "success",
-//     data: {
-//       imageUrl: cloudinaryResponse?.url,
-//     },
-//   });
-// });
 const uploadImage = catchAsync(async (req, res, next) => {
   let cloudinaryResponse;
 
@@ -49,3 +31,24 @@ const uploadImage = catchAsync(async (req, res, next) => {
 });
 
 export default uploadImage;
+
+
+
+// const uploadImage = catchAsync(async (req, res, next) => {
+//   let cloudinaryResponse;
+
+//   if (req.file) {
+//     cloudinaryResponse = await cloudinary.uploader.upload(req.file.path, {
+//       upload_preset: "cloudinary_trials",
+//     });
+//   } else {
+//     return next(new AppError("Please provide a file", 400));
+//   }
+
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       imageUrl: cloudinaryResponse?.url,
+//     },
+//   });
+// });

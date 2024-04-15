@@ -16,7 +16,7 @@ export const createPost = async (req, res) => {
       location: user.location,
       description,
       userPicturePath: user.picturePath,
-      picturePath,
+      picturePath: picturePath ? picturePath : "",
       likes: {},
       comments: [],
     });
@@ -197,6 +197,7 @@ export const updatePost = async (req, res) => {
     const { postId } = req.params;
     const { description } = req.body;
     const picturePath = req.imageUrl;
+    console.log("picturePath", picturePath);
 
     const post = await Post.findById(postId);
     if (!post) {

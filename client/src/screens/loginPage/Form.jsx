@@ -156,9 +156,9 @@ const Form = () => {
       formData.append(value, values[value]);
     }
 
-    if (!values.picture || !values.picture.name.trim()) {
-      toast.error("Please upload a picture");
-    }
+    // if (!values.picture || !values.picture.name.trim()) {
+    //   toast.error("Please upload a picture");
+    // }
 
     // formData.append("picturePath", values.picture.name);
 
