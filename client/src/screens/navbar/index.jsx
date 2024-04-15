@@ -27,6 +27,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "state";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
+import { setChatFriend } from "state";
 
 export default function Navbar() {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -102,6 +103,7 @@ export default function Navbar() {
           </IconButton>
           <IconButton
             onClick={() => {
+              dispatch(setChatFriend(null));
               navigate("/message");
             }}
           >
@@ -205,6 +207,7 @@ export default function Navbar() {
             </IconButton>
             <IconButton
               onClick={() => {
+                dispatch(setChatFriend(null));
                 navigate("/message");
               }}
             >

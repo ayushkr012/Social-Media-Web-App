@@ -7,16 +7,19 @@ import Emptychat from "./EmptyChat";
 import { setConversation } from "state";
 
 // props data came from the PostWidget.jsx and FriendListWidget.jsx
-const UserChatFreind = ({ friendId, name, subtitle, userPicturePath, online = false }) => {
+const Headername = ({ friendId, name, subtitle, userPicturePath, online = false }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
   const userId = useSelector((state) => state.user?._id);
+  const activeUsers = useSelector((state) => state.activeUsers);
 
   const getuser = async () => {
     await setConversation({ senderId: userId, receiverId: friendId })
-}
+};
+// if(activeUsers.length==0) console.log('no active');
+const isFriendOnline = activeUsers?.find(user => user._id === friendId);
 
 
   // String 
@@ -31,6 +34,7 @@ const UserChatFreind = ({ friendId, name, subtitle, userPicturePath, online = fa
         };
         getuser();
         dispatch(setChatFriend(friendData));
+
       }}
       sx={{
         "&:hover": {
@@ -51,11 +55,9 @@ const UserChatFreind = ({ friendId, name, subtitle, userPicturePath, online = fa
           >
             {name}
           </Typography>
-          {online === true ? "Online" : 
-          <Typography color={medium} fontSize="0.75rem">
-            {subtitle}
-            {/* Online */}
-          </Typography>}
+          <Typography color={isFriendOnline ? main : medium} fontSize="1rem">
+              {isFriendOnline ? "Online" : "Offline"}
+            </Typography>
 
         </Box>
       </FlexBetween>
@@ -67,4 +69,4 @@ const UserChatFreind = ({ friendId, name, subtitle, userPicturePath, online = fa
   );
 };
 
-export default UserChatFreind;
+export default Headername;

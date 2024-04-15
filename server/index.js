@@ -12,15 +12,18 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import postRoutes from "./routes/posts.js";
 import connectDB from "./config/db.js";
+import msg from "./routes/msg.js";
+import conversation from "./routes/conversation.js";
 import { register } from "./controllers/auth.js";
 import { createPost, updatePost } from "./controllers/posts.js"; // Create Post and Update Post
 import { verifyToken } from "./middleware/auth.js";
 import uploadImage from "./controllers/imageController.js";
 import { upload } from "./utils/multer.js";
-
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
+import { Server } from "socket.io";
+import http from "http";
 
 dotenv.config();
 const app = express();
@@ -99,6 +102,44 @@ app.put(
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
+app.use("/message", msg);
+app.use("/conversation", conversation);
+
+/* SOCKET.IO Part */
+const server = http.createServer(app); // Assuming `app` is your Express application
+
+const io = new Server(server, {
+  cors: {
+    // origin: "http://localhost:3000",
+    origin: "https://social-media-web-app-mu.vercel.app",
+  },
+});
+
+//Add this before the app.get() block
+io.on("connection", (socket) => {
+  console.log(`${socket.id} user just connected!`);
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
+});
+
+io.on("connection", (socket) => {
+  console.log("A client connected");
+  // Your socket connection handling logic here
+
+  let users = [];
+
+  const addUser = (userData, socketId) => {
+    !users.some((user) => user._id == userData._id) &&
+      users.push({ ...userData, socketId });
+    console.log(userData);
+  };
+
+  socket.on("addUsers", (userData) => {
+    addUser(userData, socket.id);
+    io.emit("getUsers", users);
+  });
+});
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -109,4 +150,8 @@ app.listen(PORT, () => {
   /* ADD Some Dummy DATA ONE TIME  */
   // User.insertMany(users);
   // Post.insertMany(posts);
+});
+
+server.listen(9000, () => {
+  console.log("HTTP server is running on port 9000");
 });

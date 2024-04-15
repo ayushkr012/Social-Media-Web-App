@@ -1,43 +1,70 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import UserChatFriend from "screens/chatSection/UserChatFriend";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useEffect } from "react";
+import Search from "./Search";
 import { useDispatch, useSelector } from "react-redux";
-import { setFriends } from "state";
 import { Divider } from "@mui/material";
-// props data came from chatSection/index.jsx
-const FriendListWidget = ({ userId }) => {
-  const BackendUrl = useSelector((state) => state.BackendUrl);
-  const dispatch = useDispatch();
-  const { palette } = useTheme();
-  const token = useSelector((state) => state.token);
-  const friends = useSelector((state) => state.user.friends);
+import styled from "@emotion/styled";
+import { useEffect } from "react";
+import { socket, setActiveUsers } from "state";
 
-  const getFriends = async () => {
-    const response = await fetch(`${BackendUrl}/users/${userId}/friends`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    dispatch(setFriends({ friends: data }));
-  };
+const ScrollableBox = styled(Box)`
+  overflow-y: auto;
+  height: 61vh;
+  &::-webkit-scrollbar {
+    width: 0.5em;
+  }
+  &::-webkit-scrollbar-track {
+    background: ${({ mode }) => (mode === "light" ? "#f0f0f0" : "#ggg")};
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: ${({ mode }) => (mode === "light" ? "#ccc" : "#fff")};
+  }
+`;
+
+const FriendListWidget = () => {
+  const { palette } = useTheme();
+  const dispatch= useDispatch();
+  const friends = useSelector((state) => state.user.friends);
+  const mode = useSelector((state) => state.mode);
+  const user = useSelector((state) => state.user);
+
+  // useEffect(() => {
+  //   if (socket.current) {
+  //     socket.current.emit('addUsers', user);
+  //     socket.current.on('getUsers', users => {
+  //       dispatch(setActiveUsers(users));
+  //     });
+  //   }
+  // }, [user, dispatch]);
 
   useEffect(() => {
-    getFriends();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // Ensure socket exists
+    if (socket.current) {
+      // Emit 'addUser' event with user ID when component mounts
+      socket.current.emit('addUser', user._id);
+
+      // Listen for 'getUsers' event and update active users list
+      socket.current.on('getUsers', users => {
+        dispatch(setActiveUsers(users));
+      });
+
+      // Clean up event listener on unmount
+      return () => {
+        socket.off('getUsers');
+      };
+    }
+  }, [user, dispatch]);
 
   return (
     <WidgetWrapper>
-      <Typography
-        color={palette.neutral.dark}
-        variant="h5"
-        fontWeight="500"
-        sx={{ mb: "1.5rem" }}
-      >
-        Friend List
-      </Typography>
-      <Divider sx={{ mb: "1.5rem" }} />
-      <Box display="flex" flexDirection="column" gap="1.5rem">
+      
+      <Search/>
+      
+      <Divider sx={{ mt: "1.5rem",mb: "1.5rem" }} />
+
+
+      <ScrollableBox mode={mode}>
         {Array.isArray(friends) &&
           friends.map((friend) => (
             <UserChatFriend
@@ -54,7 +81,7 @@ const FriendListWidget = ({ userId }) => {
             meaningful connections today!
           </Typography>
         )}
-      </Box>
+      </ScrollableBox>
     </WidgetWrapper>
   );
 };

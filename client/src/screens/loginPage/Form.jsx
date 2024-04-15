@@ -368,10 +368,28 @@ const Form = () => {
                         {!values.picture ? (
                           <p>Upload your Profile Picture</p>
                         ) : (
-                          <FlexBetween>
-                            <Typography>{values.picture.name}</Typography>
-                            <EditOutlinedIcon />
-                          </FlexBetween>
+                          <Box
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              gap: "0.9rem", // Add some gap between image and icon
+                              // Add any other styles you want for the Box container
+                            }}
+                          >
+                            <img
+                              width="100px" // Increase width
+                              height="100px" // Increase height
+                              alt="post"
+                              style={{
+                                objectFit: "cover",
+                                borderRadius: "50%",
+                              }}
+                              src={URL.createObjectURL(values.picture)}
+                            />
+                            <EditOutlinedIcon />{" "}
+                            {/* No need for extra styling */}
+                          </Box>
                         )}
                       </Box>
                     )}
