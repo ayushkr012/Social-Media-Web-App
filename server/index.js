@@ -17,8 +17,8 @@ import conversation from "./routes/conversation.js";
 import { register } from "./controllers/auth.js";
 import { createPost, updatePost } from "./controllers/posts.js"; // Create Post and Update Post
 import { verifyToken } from "./middleware/auth.js";
-import uploadImage from "./controllers/imageController.js";
-import { upload } from "./utils/multer.js";
+import { uploadImage, upload } from "./controllers/imageController.js";
+// import { upload } from "./utils/multer.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
