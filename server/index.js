@@ -48,18 +48,6 @@ app.use(cors());
 const PORT = process.env.PORT || 5001;
 connectDB();
 
-// /* FILE STORAGE */
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "public/assets");
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, file.originalname);
-//   },
-// });
-
-// const upload = multer({ storage: storage });
-
 /* ROUTES WITH FILE */
 
 /* --------------------------> Use Cloudinary for image store <-------------------------------*/
