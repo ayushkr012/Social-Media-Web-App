@@ -62,7 +62,7 @@ const uploadImage = catchAsync(async (req, res, next) => {
   try {
     // Convert buffer to data URL
     const dataUri = parser.format(req.file.originalname, req.file.buffer);
-    console.log(dataUri);
+    //console.log(dataUri);
     const cloudinaryResponse = await cloudinary.uploader.upload(
       dataUri.content,
       {
@@ -70,7 +70,7 @@ const uploadImage = catchAsync(async (req, res, next) => {
       }
     );
 
-    console.log("cloudinaryResponse", cloudinaryResponse.url);
+    //  console.log("cloudinaryResponse", cloudinaryResponse.url);
     // Set the imageUrl in the request object
     req.imageUrl = cloudinaryResponse.url;
 
