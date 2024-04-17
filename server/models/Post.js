@@ -16,8 +16,9 @@ const PostSchema = new mongoose.Schema(
     },
     location: String,
     description: String,
-    picturePath: String,
-    userPicturePath: String,
+    imgUrl: String, // Path to the picture file which is uploaded in cloudinary
+    videoUrl: String, // Path to the video file
+    userPicturePath: String, // User's profile picture
     likes: {
       type: Map,
       of: Boolean,

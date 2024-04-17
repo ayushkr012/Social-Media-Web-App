@@ -39,6 +39,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
 import { setPosts, setNotifications } from "state";
 import { toast } from "react-toastify";
+import CloudinaryUploader from "components/CloudinaryUploader";
 
 // props data came from the PostsWidget.jsx
 const PostWidget = ({
@@ -47,7 +48,8 @@ const PostWidget = ({
   name,
   description,
   location,
-  picturePath,
+  imgUrl,
+  videoUrl,
   userPicturePath,
   likes,
   comments,
@@ -60,8 +62,12 @@ const PostWidget = ({
   const [openShareDialog, setOpenShareDialog] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false); // State for edit modal
   const [image, setImage] = useState(null);
+  const [video, setVideo] = useState(null);
   const [newDescription, setDescription] = useState(description);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+
+  // Initialize CloudinaryUploader for save the edited post
+  const cloudinaryUploader = CloudinaryUploader();
 
   const [shareLink, setShareLink] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
@@ -87,17 +93,50 @@ const PostWidget = ({
 
   /* -----------------------------> Edit Post Implementation --------------------------< */
   const handleEditPost = async () => {
-    const formData = new FormData();
-    formData.append("description", newDescription);
-    if (image) {
-      formData.append("picture", image);
-    }
-
     try {
+      let imgUrl = null;
+      let videoUrl = null;
+
+      // Upload image if image is selected
+      if (image != null) {
+        // Get signature for Image upload
+        const { timestamp: imgTimestamp, signature: imgSignature } =
+          await cloudinaryUploader.getSignatureForUpload("images");
+        console.log("imgTimestamp", imgTimestamp, "imgSignature", imgSignature);
+        // Upload image file
+        imgUrl = await cloudinaryUploader.uploadFile(
+          image,
+          "image",
+          imgTimestamp,
+          imgSignature
+        );
+      }
+
+      // Upload video if video is selected
+      if (video != null) {
+        // Get signature for video upload
+        const { timestamp: videoTimestamp, signature: videoSignature } =
+          await cloudinaryUploader.getSignatureForUpload("videos");
+        // Upload video file
+        videoUrl = await cloudinaryUploader.uploadFile(
+          video,
+          "video",
+          videoTimestamp,
+          videoSignature
+        );
+      }
+
       const response = await fetch(`${BackendUrl}/posts/${postId}/editPost`, {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          description: newDescription,
+          imgUrl,
+          videoUrl,
+        }),
       });
 
       if (response.ok) {
@@ -106,6 +145,7 @@ const PostWidget = ({
         toast.success("Post updated successfully", { autoClose: 1000 });
         setOpenEditModal(false);
         setImage(null);
+        setVideo(null);
         setDescription("");
       } else {
         // If response.ok is false, handle error
@@ -241,14 +281,27 @@ const PostWidget = ({
       <Typography color={main} sx={{ mt: "1rem" }}>
         {description}
       </Typography>
-      {picturePath && (
+      {/* if image in the post then we display the image */}
+      {imgUrl && (
         <img
           width="100%"
           height="auto"
           alt="post"
           style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          src={picturePath}
+          src={imgUrl}
         />
+      )}
+      {/* if video in the post  then we display the video */}
+      {videoUrl && (
+        <video
+          width="100%"
+          height="auto"
+          controls
+          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
+        >
+          <source src={videoUrl} />
+          {/* Optionally, provide fallback content here */}
+        </video>
       )}
       {/*  -----------------------> Like, Comment, Share  and edit Section ----------------------------< */}
       <FlexBetween mt="0.25rem">
@@ -361,28 +414,59 @@ const PostWidget = ({
           <Box position="relative" width="100%">
             {/* Dropzone component */}
             <Dropzone
-              acceptedFiles=".jpg,.jpeg,.png"
+              acceptedFiles={["image/*", "video/*"]} // Accept only images and videos
               multiple={false}
-              onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
+              onDrop={(acceptedFiles) => {
+                const file = acceptedFiles[0];
+                if (file.type.startsWith("image")) {
+                  setImage(file);
+                  setVideo(null); // Reset video if image is selected
+                } else if (file.type.startsWith("video")) {
+                  setVideo(file);
+                  setImage(null); // Reset image if video is selected
+                }
+              }}
             >
               {({ getRootProps, getInputProps }) => (
                 <Box {...getRootProps()} position="relative">
                   {/* Input for Dropzone */}
                   <input {...getInputProps()} />
-                  {/* when newImage are not selected then we display the curernt image of the post */}
-                  {!image && (
-                    <img
-                      width="100%"
-                      height="auto"
-                      alt="post"
-                      style={{
-                        borderRadius: "0.75rem",
-                        marginTop: "0.75rem",
-                      }}
-                      src={picturePath}
-                    />
+
+                  {/* when newImage are not selected then we display the curernt image or video of the post */}
+                  {!image && !video && (
+                    <div>
+                      {/* if image in the post then we display the image */}
+                      {imgUrl && (
+                        <img
+                          width="100%"
+                          height="auto"
+                          alt="post"
+                          style={{
+                            borderRadius: "0.75rem",
+                            marginTop: "0.75rem",
+                          }}
+                          src={imgUrl}
+                        />
+                      )}
+                      {/* if video in the post then we display the video */}
+                      {videoUrl && (
+                        <video
+                          width="100%"
+                          height="auto"
+                          controls
+                          style={{
+                            borderRadius: "0.75rem",
+                            marginTop: "0.75rem",
+                          }}
+                        >
+                          <source src={videoUrl} />
+                          {/* Optionally, provide fallback content here */}
+                        </video>
+                      )}
+                    </div>
                   )}
-                  {/* display new Selected Image */}
+
+                  {/* display when user select the image */}
                   {image && (
                     <img
                       width="100%"
@@ -395,8 +479,25 @@ const PostWidget = ({
                       src={URL.createObjectURL(image)}
                     />
                   )}
-                  {/* Render edit icon at the top right corner when image is not selected*/}
-                  {!image && (
+
+                  {/* display when user select the video */}
+                  {video && (
+                    <video
+                      width="100%"
+                      height="auto"
+                      controls
+                      style={{
+                        borderRadius: "0.75rem",
+                        marginTop: "0.75rem",
+                      }}
+                    >
+                      <source src={URL.createObjectURL(video)} />
+                      {/* Optionally, provide fallback content here */}
+                    </video>
+                  )}
+
+                  {/* Render edit icon at the top right corner when image or video is not selected*/}
+                  {!image && !video && (
                     <IconButton
                       sx={{
                         position: "absolute",
@@ -424,10 +525,13 @@ const PostWidget = ({
                 </Box>
               )}
             </Dropzone>
-            {/* Render delete icon if an image is selected */}
-            {image && (
+            {/* Render delete icon if either image or video  is selected */}
+            {(image || video) && (
               <IconButton
-                onClick={() => setImage(null)}
+                onClick={() => {
+                  setImage(null);
+                  setVideo(null);
+                }}
                 sx={{
                   position: "absolute",
                   top: "0.5rem",
@@ -459,14 +563,18 @@ const PostWidget = ({
           }}
         >
           <Button
-            onClick={() => setOpenEditModal(false) || setImage(null)}
+            onClick={() => {
+              setOpenEditModal(false);
+              setImage(null);
+              setVideo(null);
+            }}
             sx={{
               cursor: "pointer",
             }}
           >
             Cancel
           </Button>
-          {(image || newDescription !== description) && (
+          {(image || newDescription !== description || video) && (
             <Button variant="contained" onClick={handleEditPost}>
               Save
             </Button>

@@ -53,7 +53,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
             lastName,
             description,
             location,
-            picturePath,
+            imgUrl,
+            videoUrl,
             userPicturePath,
             likes,
             comments,
@@ -65,7 +66,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
               name={`${firstName} ${lastName}`}
               description={description}
               location={location}
-              picturePath={picturePath}
+              imgUrl={imgUrl}
+              videoUrl={videoUrl}
               userPicturePath={userPicturePath}
               likes={likes}
               comments={comments}

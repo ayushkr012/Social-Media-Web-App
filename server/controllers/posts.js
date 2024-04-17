@@ -4,9 +4,12 @@ import User from "../models/User.js";
 /* CREATE POST */
 export const createPost = async (req, res) => {
   try {
-    const { userId, description } = req.body;
-    const picturePath = req.imageUrl; // after the image upload in cloudinary we get the image url from the request object
-    console.log("picturePath", picturePath);
+    const { userId, description, imgUrl, videoUrl } = req.body;
+    // console.log(req.body);
+
+    // Check if the user has uploaded a picture or video
+    console.log("imageurl", imgUrl, "videourl", videoUrl);
+
     const user = await User.findById(userId);
 
     const newPost = new Post({
@@ -14,9 +17,10 @@ export const createPost = async (req, res) => {
       firstName: user.firstName,
       lastName: user.lastName,
       location: user.location,
-      description,
+      description: description.length > 0 ? description : "",
       userPicturePath: user.picturePath,
-      picturePath: picturePath ? picturePath : "",
+      imgUrl: imgUrl ? imgUrl : "",
+      videoUrl: videoUrl ? videoUrl : "",
       likes: {},
       comments: [],
     });
@@ -25,7 +29,6 @@ export const createPost = async (req, res) => {
 
     // Return all posts after creating a new post
     const posts = await Post.find().sort({ _id: -1 });
-    // const allPosts = posts.map((post) => post.toObject()); // Convert each post to object
     res.status(201).json(posts);
   } catch (error) {
     console.log(error);
@@ -195,9 +198,7 @@ export const deletePost = async (req, res) => {
 export const updatePost = async (req, res) => {
   try {
     const { postId } = req.params;
-    const { description } = req.body;
-    const picturePath = req.imageUrl;
-    console.log("picturePath", picturePath);
+    const { description, imgUrl, videoUrl } = req.body;
 
     const post = await Post.findById(postId);
     if (!post) {
@@ -207,7 +208,8 @@ export const updatePost = async (req, res) => {
     }
     if (description) post.description = description;
 
-    if (picturePath) post.picturePath = picturePath;
+    if (imgUrl) post.imgUrl = imgUrl;
+    if (videoUrl) post.videoUrl = videoUrl;
 
     const updatedPost = await post.save();
 

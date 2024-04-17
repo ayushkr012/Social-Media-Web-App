@@ -7,6 +7,7 @@ import {
   MicOutlined,
   MoreHorizOutlined,
 } from "@mui/icons-material";
+import VideoFileIcon from "@mui/icons-material/VideoFile";
 import {
   Box,
   Divider,
@@ -25,12 +26,16 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 import { ToastContainer, toast } from "react-toastify";
+import CloudinaryUploader from "components/CloudinaryUploader";
 
-// props data came from homePage/index.jsx
+// props data came from homePage/index.jsx  (picturePath is the user  profile image)
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
+  const [isVideo, setIsVideo] = useState(false);
   const [image, setImage] = useState(null);
+  const [video, setVideo] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState("");
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
@@ -41,27 +46,166 @@ const MyPostWidget = ({ picturePath }) => {
   const BackendUrl = useSelector((state) => state.BackendUrl);
   const mode = useSelector((state) => state.mode);
 
-  const handlePost = async () => {
-    const formData = new FormData();
-    formData.append("userId", _id);
-    formData.append("description", description);
-    if (image) {
-      formData.append("picture", image);
+  // Initialize CloudinaryUploader
+  const cloudinaryUploader = CloudinaryUploader();
+
+  // upload the file (image or video ) to the cloudinary server
+  const uploadFile = async (type, timestamp, signature) => {
+    const folder = type === "image" ? "images" : "videos"; // folder name in cloudinary where we want to store the file images and videos folder already created in cloudinary
+
+    const data = new FormData();
+    data.append("file", type === "image" ? image : video); // if type is image then we upload image file else video file
+    data.append("timestamp", timestamp);
+    data.append("signature", signature);
+    data.append("api_key", "687414865223346"); //process.env.REACT_APP_CLOUDINARY_API_KEY
+    data.append("folder", folder);
+
+    try {
+      let cloudName = "debwa5itl"; // process.env.REACT_APP_CLOUDINARY_CLOUD_NAME
+      let resourceType = type === "image" ? "image" : "video";
+      let api = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+
+      const res = await fetch(api, {
+        method: "POST",
+        body: data,
+      });
+      const responseData = await res.json();
+      const { secure_url } = responseData;
+      // console.log(secure_url);
+      return secure_url;
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const response = await fetch(`${BackendUrl}/posts`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
-    const posts = await response.json();
+  // Get signature for upload from the server
+  const getSignatureForUpload = async (folder) => {
+    try {
+      const res = await fetch(`${BackendUrl}/uploadfile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ folder }),
+      });
+      const { timestamp, signature } = await res.json();
+      console.log("timestamp", timestamp, "signature", signature);
+      return { timestamp, signature };
 
-    toast.success("Post created successfully", { autoClose: 1000 });
-    dispatch(setPosts({ posts }));
-    // after successfull post we reset the image and description
-    setImage(null);
-    setIsImage(false);
-    setDescription("");
+      // return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // const handlePost = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     // Upload image if available
+  //     let imgUrl = null;
+  //     let videoUrl = null;
+  //     if (image != null) {
+  //       // Get signature for Image upload
+  //       const { timestamp: imgTimestamp, signature: imgSignature } =
+  //         await getSignatureForUpload("images");
+  //       // Upload image file
+  //       imgUrl = await uploadFile("image", imgTimestamp, imgSignature);
+  //     }
+
+  //     // Upload video if available
+  //     if (video != null) {
+  //       // Get signature for video upload
+  //       const { timestamp: videoTimestamp, signature: videoSignature } =
+  //         await getSignatureForUpload("videos");
+  //       // Upload video file
+  //       videoUrl = await uploadFile("video", videoTimestamp, videoSignature);
+  //     }
+
+  //     // console.log("imgUrl", imgUrl, "videoUrl", videoUrl);
+
+  //     const response = await fetch(`${BackendUrl}/posts/createPost`, {
+  //       method: "POST",
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         "Content-Type": "application/json",
+  //       },
+
+  //       body: JSON.stringify({ userId: _id, description, imgUrl, videoUrl }),
+  //     });
+  //     const posts = await response.json();
+
+  //     toast.success("Post created successfully", { autoClose: 1000 });
+  //     console.log("File upload success!");
+  //     dispatch(setPosts({ posts }));
+  //     // after successfull post we reset the image and description and video states
+  //     setImage(null);
+  //     setVideo(null);
+  //     setIsVideo(false);
+  //     setIsImage(false);
+  //     setDescription("");
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  const handlePost = async (e) => {
+    e.preventDefault();
+    try {
+      let imgUrl = null;
+      let videoUrl = null;
+
+      // Upload image if available
+      if (image != null) {
+        // Get signature for Image upload
+        const { timestamp: imgTimestamp, signature: imgSignature } =
+          await cloudinaryUploader.getSignatureForUpload("images");
+        console.log("imgTimestamp", imgTimestamp, "imgSignature", imgSignature);
+        // Upload image file
+        imgUrl = await cloudinaryUploader.uploadFile(
+          image,
+          "image",
+          imgTimestamp,
+          imgSignature
+        );
+      }
+
+      // Upload video if available
+      if (video != null) {
+        // Get signature for video upload
+        const { timestamp: videoTimestamp, signature: videoSignature } =
+          await cloudinaryUploader.getSignatureForUpload("videos");
+        // Upload video file
+        videoUrl = await cloudinaryUploader.uploadFile(
+          video,
+          "video",
+          videoTimestamp,
+          videoSignature
+        );
+      }
+
+      // Once all uploads are complete, proceed with creating the post
+      const response = await fetch(`${BackendUrl}/posts/createPost`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: _id, description, imgUrl, videoUrl }),
+      });
+      const posts = await response.json();
+
+      toast.success("Post created successfully", { autoClose: 1000 });
+      console.log("File upload success!");
+      dispatch(setPosts({ posts }));
+      // after successful post, reset the image and description and video states
+      setImage(null);
+      setVideo(null);
+      setIsVideo(false);
+      setIsImage(false);
+      setDescription("");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -88,7 +232,7 @@ const MyPostWidget = ({ picturePath }) => {
           p="1rem"
         >
           <Dropzone
-            acceptedFiles=".jpg,.jpeg,.png"
+            acceptedFiles="image/*"
             multiple={false}
             onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
           >
@@ -135,9 +279,73 @@ const MyPostWidget = ({ picturePath }) => {
           </Dropzone>
         </Box>
       )}
+      {isVideo && (
+        <Box
+          border={`1px solid ${medium}`}
+          borderRadius="5px"
+          mt="1rem"
+          p="1rem"
+        >
+          <Dropzone
+            acceptedFiles="video/*"
+            multiple={false}
+            onDrop={(acceptedFiles) => setVideo(acceptedFiles[0])}
+          >
+            {({ getRootProps, getInputProps }) => (
+              <FlexBetween>
+                <Box
+                  {...getRootProps()}
+                  width="100%"
+                  sx={{ "&:hover": { cursor: "pointer" } }}
+                >
+                  <input {...getInputProps()} />
+                  {!video ? (
+                    <Box border={`2px dashed ${palette.primary.main}`} p="1rem">
+                      <p>Add Video Here</p>
+                    </Box>
+                  ) : (
+                    <FlexBetween alignItems="center">
+                      <video
+                        width="100%"
+                        height="auto"
+                        alt="video"
+                        controls // Add controls attribute to enable video controls
+                        style={{ borderRadius: "0.75rem", marginTop: "0rem" }}
+                      >
+                        <source
+                          src={URL.createObjectURL(video)} // Use URL.createObjectURL to create a temporary URL for the selected video
+                          type={video.type} // Use the type attribute of the selected video
+                        />
+                        {/* Your browser does not support the video tag. */}
+                      </video>
+                      <EditOutlined sx={{ marginLeft: "0.9rem" }} />
+                    </FlexBetween>
+                  )}
+                </Box>
+                {video && (
+                  <IconButton
+                    onClick={() => setVideo(null)}
+                    sx={{ width: "9%" }}
+                  >
+                    <DeleteOutlined />
+                  </IconButton>
+                )}
+                {/* Optionally add a delete button for video */}
+              </FlexBetween>
+            )}
+          </Dropzone>
+        </Box>
+      )}
       <Divider sx={{ margin: "1.25rem 0" }} />
       <FlexBetween>
-        <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
+        <FlexBetween
+          gap="0.25rem"
+          onClick={() => {
+            setIsImage(!isImage);
+            setIsVideo(false);
+            setVideo(null); // when user click on image icon we set video to null because at the same time user can't upload image and video
+          }}
+        >
           <ImageOutlined sx={{ color: mediumMain }} />
           <Typography
             color={mediumMain}
@@ -146,13 +354,25 @@ const MyPostWidget = ({ picturePath }) => {
             Image
           </Typography>
         </FlexBetween>
+
+        <FlexBetween
+          gap="0.25rem"
+          onClick={() => {
+            setIsVideo(!isVideo);
+            setIsImage(false);
+            setImage(null); // when user click on video icon we set image to null because at the same time user can't upload image and video
+          }}
+        >
+          <VideoFileIcon sx={{ color: mediumMain }} />
+          <Typography
+            color={mediumMain}
+            sx={{ "&:hover": { cursor: "pointer", color: medium } }}
+          >
+            Video
+          </Typography>
+        </FlexBetween>
         {isNonMobileScreens ? (
           <>
-            <FlexBetween gap="0.25rem">
-              <GifBoxOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Clip</Typography>
-            </FlexBetween>
-
             <FlexBetween gap="0.25rem">
               <AttachFileOutlined sx={{ color: mediumMain }} />
               <Typography color={mediumMain}>Attachment</Typography>
@@ -171,7 +391,7 @@ const MyPostWidget = ({ picturePath }) => {
         )}
 
         <Button
-          disabled={!description && !image} // we keep as it optional user can post their post without description
+          disabled={!description && !image && !video} // we keep as it optional user can post their post without description
           onClick={handlePost}
           sx={{
             "&:hover": {

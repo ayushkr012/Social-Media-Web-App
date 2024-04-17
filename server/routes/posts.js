@@ -4,13 +4,21 @@ import {
   getUserPosts,
   likePost,
   deletePost,
+  createPost,
+  updatePost,
 } from "../controllers/posts.js";
 import { verifyToken } from "../middleware/auth.js";
 const postRoutes = express.Router();
 
+/*Create Post */
+postRoutes.post("/createPost", verifyToken, createPost);
+
 /* READ */
 postRoutes.get("/", verifyToken, getFeedPosts);
 postRoutes.get("/:userId/posts", getUserPosts);
+
+/* Update Post */
+postRoutes.put("/:postId/editPost", verifyToken, updatePost);
 
 /* Update Notification and  impressions and Likes when SomeOne Like the Post */
 postRoutes.patch("/:id/like", verifyToken, likePost);

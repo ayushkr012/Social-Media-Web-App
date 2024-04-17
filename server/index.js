@@ -14,11 +14,8 @@ import postRoutes from "./routes/posts.js";
 import connectDB from "./config/db.js";
 import msg from "./routes/msg.js";
 import conversation from "./routes/conversation.js";
-import { register } from "./controllers/auth.js";
-import { createPost, updatePost } from "./controllers/posts.js"; // Create Post and Update Post
+import { generateSignature } from "./controllers/cloudinaryUpload.js";
 import { verifyToken } from "./middleware/auth.js";
-import { uploadImage, upload } from "./controllers/imageController.js";
-// import { upload } from "./utils/multer.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
@@ -48,43 +45,30 @@ app.use(cors());
 const PORT = process.env.PORT || 5001;
 connectDB();
 
-/* ROUTES WITH FILE */
-
-/* --------------------------> Use Cloudinary for image store <-------------------------------*/
-
-/*Register */
-app.post("/auth/register", upload.single("picture"), uploadImage, register);
-
-/*Create Post */
-app.post(
-  "/posts",
-  verifyToken,
-  upload.single("picture"),
-  uploadImage,
-  createPost
-);
+/* Cloudinary Configuration when user upload image or videos */
+app.post("/uploadfile", generateSignature);
 
 /*Update Post */
-app.put(
-  "/posts/:postId/editPost",
-  verifyToken,
-  upload.single("picture"), // Attach upload middleware directly to the route
-  (req, res, next) => {
-    // Check if picture exists in request file
-    if (req.file) {
-      // If picture exists, execute uploadImage middleware
-      uploadImage(req, res, (err) => {
-        if (err) {
-          return res.status(400).json({ error: "Failed to upload picture." });
-        }
-        next(); // Move to the next middleware
-      });
-    } else {
-      next(); // Move to the next middleware directly
-    }
-  },
-  updatePost
-);
+// app.put(
+//   "/posts/:postId/editPost",
+//   verifyToken,
+//   upload.single("picture"), // Attach upload middleware directly to the route
+//   (req, res, next) => {
+//     // Check if picture exists in request file
+//     if (req.file) {
+//       // If picture exists, execute uploadImage middleware
+//       uploadImage(req, res, (err) => {
+//         if (err) {
+//           return res.status(400).json({ error: "Failed to upload picture." });
+//         }
+//         next(); // Move to the next middleware
+//       });
+//     } else {
+//       next(); // Move to the next middleware directly
+//     }
+//   },
+//   updatePost
+// );
 
 /* ROUTES */
 app.use("/auth", authRoutes);
