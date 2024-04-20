@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 const NotificationWidget = ({ userId }) => {
   const { palette } = useTheme();
   const notifications = useSelector((state) => state.notifications);
-  console.log(notifications);
+  // console.log(notifications);
   const mode = useSelector((state) => state.mode);
 
   return (

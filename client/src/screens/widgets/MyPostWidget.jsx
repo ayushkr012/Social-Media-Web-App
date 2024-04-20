@@ -71,7 +71,7 @@ const MyPostWidget = ({ picturePath }) => {
       });
       const responseData = await res.json();
       const { secure_url } = responseData;
-      // console.log(secure_url);
+      console.log(secure_url);
       return secure_url;
     } catch (error) {
       console.error(error);
@@ -138,7 +138,7 @@ const MyPostWidget = ({ picturePath }) => {
   //     const posts = await response.json();
 
   //     toast.success("Post created successfully", { autoClose: 1000 });
-  //     console.log("File upload success!");
+      // console.log("File upload success!");
   //     dispatch(setPosts({ posts }));
   //     // after successfull post we reset the image and description and video states
   //     setImage(null);
