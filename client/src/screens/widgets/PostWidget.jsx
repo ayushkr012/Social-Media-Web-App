@@ -87,7 +87,7 @@ const PostWidget = ({
   const medium = palette.neutral.medium;
   // console.log(loggedInUserId);
 
-  const isOwnPost = loggedInUserId === postUserId || loggedInUserId;
+  const isOwnPost = loggedInUserId === postUserId;
 
   /* -----------------------------> Edit Post Implementation --------------------------< */
   const handleEditPost = async () => {
@@ -178,7 +178,7 @@ const PostWidget = ({
       );
       const data = await response.json();
 
-     // console.log("Data received from server:", data); // Log the data received from the server
+      // console.log("Data received from server:", data); // Log the data received from the server
 
       // Dispatch the setPost action to update the liked post
       dispatch(setPost({ post: data.updatedPost }));
