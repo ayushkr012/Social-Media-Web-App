@@ -74,7 +74,6 @@ const PostWidget = ({
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user?._id);
-  const BackendUrl = useSelector((state) => state.BackendUrl);
   // console.log("Likes:", Object.keys(likes).length);
 
   const isLiked = loggedInUserId ? Boolean(likes[loggedInUserId]) : false;
@@ -88,8 +87,7 @@ const PostWidget = ({
   const medium = palette.neutral.medium;
   // console.log(loggedInUserId);
 
-  const isOwnPost =
-    loggedInUserId === postUserId || loggedInUserId == "c0baccb754e2cf";
+  const isOwnPost = loggedInUserId === postUserId || loggedInUserId;
 
   /* -----------------------------> Edit Post Implementation --------------------------< */
   const handleEditPost = async () => {
@@ -126,18 +124,21 @@ const PostWidget = ({
         );
       }
 
-      const response = await fetch(`${BackendUrl}/posts/${postId}/editPost`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          description: newDescription,
-          imgUrl,
-          videoUrl,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/posts/${postId}/editPost`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            description: newDescription,
+            imgUrl,
+            videoUrl,
+          }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -146,7 +147,7 @@ const PostWidget = ({
         setOpenEditModal(false);
         setImage(null);
         setVideo(null);
-        setDescription("");
+        setDescription(description);
       } else {
         // If response.ok is false, handle error
         toast.error("Failed to edit post");
@@ -161,17 +162,20 @@ const PostWidget = ({
   // when user like the post then we send the data to the server to update the notification so user get notified when someone like their post
   const patchLike = async () => {
     try {
-      const response = await fetch(`${BackendUrl}/posts/${postId}/like`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: loggedInUserId,
-          postUserId: postUserId,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/posts/${postId}/like`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: loggedInUserId,
+            postUserId: postUserId,
+          }),
+        }
+      );
       const data = await response.json();
 
       console.log("Data received from server:", data); // Log the data received from the server
@@ -197,7 +201,7 @@ const PostWidget = ({
         // here we pass the postId to delete the post
         // and the loggedInUserId to and isProfile to check when user is on the profile page then we return only userAllPost when user
         // is on the home page then we return all the post
-        `${BackendUrl}/posts/${postId}/${loggedInUserId}/?isProfile=${isProfile}`,
+        `${process.env.REACT_APP_Backend_URL}/posts/${postId}/${loggedInUserId}/?isProfile=${isProfile}`,
         {
           method: "DELETE",
           headers: {
@@ -222,7 +226,7 @@ const PostWidget = ({
   /* ----------------- Share Post Implementation -----------------  */
   const handleSharePost = () => {
     // Generate shareable link
-    const shareableLink = `${BackendUrl}/posts/${postUserId}/posts`;
+    const shareableLink = `${process.env.REACT_APP_Backend_URL}/posts/${postUserId}/posts`;
     setShareLink(shareableLink);
     setOpenShareDialog(true);
   };
@@ -403,6 +407,13 @@ const PostWidget = ({
             placeholder="What's on your mind..."
             onChange={(e) => setDescription(e.target.value)}
             value={newDescription}
+            // multiline // Enable multiline input
+            // onKeyDown={(e) => {
+            //   if (e.key === "Enter") {
+            //     e.preventDefault(); // Prevent default behavior of Enter key
+            //     setDescription((prevDescription) => prevDescription + "\n"); // Add a new line character
+            //   }
+            // }}
             sx={{
               width: "100%",
               backgroundColor: palette.neutral.light,
@@ -410,6 +421,7 @@ const PostWidget = ({
               padding: "1rem 2rem",
             }}
           />
+
           {/* Container for Dropzone and image */}
           <Box position="relative" width="100%">
             {/* Dropzone component */}

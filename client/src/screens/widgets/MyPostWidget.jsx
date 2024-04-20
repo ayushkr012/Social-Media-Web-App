@@ -26,6 +26,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 import { ToastContainer, toast } from "react-toastify";
+import Loading from "components/Loading";
 import CloudinaryUploader from "components/CloudinaryUploader";
 
 // props data came from homePage/index.jsx  (picturePath is the user  profile image)
@@ -35,7 +36,7 @@ const MyPostWidget = ({ picturePath }) => {
   const [isVideo, setIsVideo] = useState(false);
   const [image, setImage] = useState(null);
   const [video, setVideo] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [description, setDescription] = useState("");
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
@@ -43,7 +44,6 @@ const MyPostWidget = ({ picturePath }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
-  const BackendUrl = useSelector((state) => state.BackendUrl);
   const mode = useSelector((state) => state.mode);
 
   // Initialize CloudinaryUploader
@@ -81,13 +81,16 @@ const MyPostWidget = ({ picturePath }) => {
   // Get signature for upload from the server
   const getSignatureForUpload = async (folder) => {
     try {
-      const res = await fetch(`${BackendUrl}/uploadfile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ folder }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/uploadfile`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ folder }),
+        }
+      );
       const { timestamp, signature } = await res.json();
       console.log("timestamp", timestamp, "signature", signature);
       return { timestamp, signature };
@@ -123,7 +126,7 @@ const MyPostWidget = ({ picturePath }) => {
 
   //     // console.log("imgUrl", imgUrl, "videoUrl", videoUrl);
 
-  //     const response = await fetch(`${BackendUrl}/posts/createPost`, {
+  //     const response = await fetch(`${process.env.REACT_APP_Backend_URL}/posts/createPost`, {
   //       method: "POST",
   //       headers: {
   //         Authorization: `Bearer ${token}`,
@@ -151,6 +154,7 @@ const MyPostWidget = ({ picturePath }) => {
   const handlePost = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
       let imgUrl = null;
       let videoUrl = null;
 
@@ -184,14 +188,17 @@ const MyPostWidget = ({ picturePath }) => {
       }
 
       // Once all uploads are complete, proceed with creating the post
-      const response = await fetch(`${BackendUrl}/posts/createPost`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId: _id, description, imgUrl, videoUrl }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/posts/createPost`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: _id, description, imgUrl, videoUrl }),
+        }
+      );
       const posts = await response.json();
 
       toast.success("Post created successfully", { autoClose: 1000 });
@@ -203,7 +210,9 @@ const MyPostWidget = ({ picturePath }) => {
       setIsVideo(false);
       setIsImage(false);
       setDescription("");
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       console.error(error);
     }
   };
@@ -216,6 +225,13 @@ const MyPostWidget = ({ picturePath }) => {
           placeholder="What's on your mind..."
           onChange={(e) => setDescription(e.target.value)}
           value={description}
+          multiline // Enable multiline input
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault(); // Prevent default behavior of Enter key
+              setDescription((prevDescription) => prevDescription + "\n"); // Add a new line character
+            }
+          }}
           sx={{
             width: "100%",
             backgroundColor: palette.neutral.light,
@@ -390,20 +406,26 @@ const MyPostWidget = ({ picturePath }) => {
           </FlexBetween>
         )}
 
-        <Button
-          disabled={!description && !image && !video} // we keep as it optional user can post their post without description
-          onClick={handlePost}
-          sx={{
-            "&:hover": {
-              color:
-                mode === "dark" ? palette.primary.dark : palette.primary.main,
-            },
-            borderRadius: "3rem",
-            backgroundColor: palette.primary.light,
-          }}
-        >
-          POST
-        </Button>
+        {isLoading ? (
+          <WidgetWrapper>
+            <Loading />
+          </WidgetWrapper>
+        ) : (
+          <Button
+            disabled={!description && !image && !video} // we keep as it optional user can post their post without description
+            onClick={handlePost}
+            sx={{
+              "&:hover": {
+                color:
+                  mode === "dark" ? palette.primary.dark : palette.primary.main,
+              },
+              borderRadius: "3rem",
+              backgroundColor: palette.primary.light,
+            }}
+          >
+            POST
+          </Button>
+        )}
       </FlexBetween>
       {/* we direct can't use ToastContainer here it gives toggle error beacuse all these part are came from home 
       page so we use toast conatiner homepage only and here we set all the success and error message of taost  */}

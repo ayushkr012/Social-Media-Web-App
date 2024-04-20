@@ -208,8 +208,15 @@ export const updatePost = async (req, res) => {
     }
     if (description) post.description = description;
 
-    if (imgUrl) post.imgUrl = imgUrl;
-    if (videoUrl) post.videoUrl = videoUrl;
+    if (imgUrl) {
+      post.imgUrl = imgUrl;
+      post.videoUrl = ""; // Remove videoUrl if imgUrl is present
+    }
+    if (videoUrl) {
+      post.videoUrl = videoUrl;
+
+      post.imgUrl = ""; // Remove imgUrl if videoUrl is present
+    }
 
     const updatedPost = await post.save();
 

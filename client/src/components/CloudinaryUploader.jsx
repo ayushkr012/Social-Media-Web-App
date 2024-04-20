@@ -4,8 +4,6 @@ import { useSelector } from "react-redux";
 const CloudinaryUploader = () => {
   const [timestamp, setTimestamp] = useState(null);
   const [signature, setSignature] = useState(null);
-  const BackendUrl = useSelector((state) => state.BackendUrl);
-
   const uploadFile = async (file, type, timestamp, signature) => {
     const folder = type === "image" ? "images" : "videos";
 
@@ -13,7 +11,7 @@ const CloudinaryUploader = () => {
     data.append("file", file);
     data.append("timestamp", timestamp);
     data.append("signature", signature);
-    data.append("api_key", "687414865223346"); //process.env.REACT_APP_CLOUDINARY_API_KEY
+    data.append("api_key", process.env.REACT_APP_CLOUDINARY_API_KEY);
     data.append("folder", folder);
 
     try {
@@ -27,6 +25,7 @@ const CloudinaryUploader = () => {
       });
       const responseData = await res.json();
       const { secure_url } = responseData;
+      console.log(secure_url);
       return secure_url;
     } catch (error) {
       console.error(error);
@@ -35,7 +34,7 @@ const CloudinaryUploader = () => {
 
   const getSignatureForUpload = async (folder) => {
     try {
-      const res = await fetch(`${BackendUrl}/uploadfile`, {
+      const res = await fetch(`${process.env.REACT_APP_Backend_URL}/uploadfile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

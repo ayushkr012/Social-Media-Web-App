@@ -26,7 +26,6 @@ const UserWidget = ({ userId, picturePath, isProfile = false }) => {
   const main = palette.neutral.main;
   const user = useSelector((state) => state.user);
   const LoggedInUser = useSelector((state) => state.user?._id);
-  const BackendUrl = useSelector((state) => state.BackendUrl);
   const mode = useSelector((state) => state.mode);
   const dispatch = useDispatch();
   const [ProfileUser, setProfileUser] = useState(null);
@@ -34,12 +33,15 @@ const UserWidget = ({ userId, picturePath, isProfile = false }) => {
   // let suppose we get the other user profile  then we have to fetch the data of that user
   const getUserData = async () => {
     try {
-      const response = await fetch(`${BackendUrl}/users/${userId}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/users/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const user = await response.json();
 
       setProfileUser(user);
@@ -67,14 +69,17 @@ const UserWidget = ({ userId, picturePath, isProfile = false }) => {
     console.log("editedUser", editedUser);
     // Handle saving edited user data
     try {
-      const response = await fetch(`${BackendUrl}/users/${userId}/edituser`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(editedUser),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/users/${userId}/edituser`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(editedUser),
+        }
+      );
 
       const json = await response.json();
       if (json.success) {

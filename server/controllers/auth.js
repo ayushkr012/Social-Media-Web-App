@@ -12,20 +12,18 @@ export const register = async (req, res) => {
       lastName,
       email,
       password,
-      friends,
       location,
       occupation,
+      imgUrl,
     } = req.body;
-    const picturePath = req.imageUrl;
-    console.log(req.imageUrl);
     if (
       !firstName ||
       !lastName ||
       !email ||
       !password ||
-      !picturePath ||
       !location ||
-      !occupation
+      !occupation ||
+      !imgUrl
     ) {
       return res
         .status(400)
@@ -65,8 +63,7 @@ export const register = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      picturePath,
-      friends,
+      picturePath: imgUrl,
       location,
       occupation,
       viewedProfile: 0, // Math.floor(Math.random() * 10000),

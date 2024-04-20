@@ -20,6 +20,9 @@ import Dropzone from "react-dropzone";
 import FlexBetween from "components/FlexBetween";
 import Loading from "components/Loading";
 import WidgetWrapper from "components/WidgetWrapper";
+
+import CloudinaryUploader from "components/CloudinaryUploader";
+
 // yup It allows you to define a schema for an object and then validate that object against the specified schema.
 const registerSchema = yup.object().shape({
   firstName: yup.string().required("required"),
@@ -79,7 +82,9 @@ const Form = () => {
   const isRegister = pageType === "register";
   const isOtpLogin = pageType === "otp";
   const isEnterOtp = pageType == "enterOtp";
-  const BackendUrl = useSelector((state) => state.BackendUrl);
+
+  // Initialize CloudinaryUploader
+  const cloudinaryUploader = CloudinaryUploader();
 
   const handleOtpLogin = () => {
     // when user clink on login with otp set pageType to otp
@@ -89,15 +94,18 @@ const Form = () => {
   const SendOtp = async (values, onSubmitProps) => {
     try {
       setIsSubmitting(true);
-      const response = await fetch(`${BackendUrl}/auth/sendotp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: values.email,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/auth/sendotp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: values.email,
+          }),
+        }
+      );
 
       const json = await response.json();
       if (json.success) {
@@ -119,16 +127,19 @@ const Form = () => {
 
   const enterOtp = async (values, onSubmitProps) => {
     setIsSubmitting(true);
-    const response = await fetch(`${BackendUrl}/auth/verifyotp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "Application/json",
-      },
-      body: JSON.stringify({
-        email: userEmail,
-        otp: values.otp,
-      }),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_Backend_URL}/auth/verifyotp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "Application/json",
+        },
+        body: JSON.stringify({
+          email: userEmail,
+          otp: values.otp,
+        }),
+      }
+    );
     const json = await response.json();
     if (json.success) {
       dispatch(
@@ -149,25 +160,44 @@ const Form = () => {
   };
 
   const register = async (values, onSubmitProps) => {
-    // this allows us to send form info with image
     setIsSubmitting(true);
-    const formData = new FormData();
-    for (let value in values) {
-      formData.append(value, values[value]);
+
+    let imgUrl = null;
+
+    // Upload image if available
+    if (values.picture != null) {
+      // Get signature for Image upload
+      const { timestamp: imgTimestamp, signature: imgSignature } =
+        await cloudinaryUploader.getSignatureForUpload("images");
+      console.log("imgTimestamp", imgTimestamp, "imgSignature", imgSignature);
+      // Upload image file
+      imgUrl = await cloudinaryUploader.uploadFile(
+        values.picture,
+        "image",
+        imgTimestamp,
+        imgSignature
+      );
     }
 
-    // if (!values.picture || !values.picture.name.trim()) {
-    //   toast.error("Please upload a picture");
-    // }
-
-    // formData.append("picturePath", values.picture.name);
-
-    const savedUserResponse = await fetch(`${BackendUrl}/auth/register`, {
-      method: "POST",
-      body: formData,
-    });
+    const savedUserResponse = await fetch(
+      `${process.env.REACT_APP_Backend_URL}/auth/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          password: values.password,
+          location: values.location,
+          occupation: values.occupation,
+          imgUrl: imgUrl,
+        }),
+      }
+    );
     const json = await savedUserResponse.json();
-    // onSubmitProps.resetForm();
 
     if (json.success) {
       toast.success(json.message);
@@ -182,11 +212,14 @@ const Form = () => {
 
   const login = async (values, onSubmitProps) => {
     setIsSubmitting(true);
-    const loggedInResponse = await fetch(`${BackendUrl}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
+    const loggedInResponse = await fetch(
+      `${process.env.REACT_APP_Backend_URL}/auth/login`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      }
+    );
     const json = await loggedInResponse.json();
 
     if (json.success) {

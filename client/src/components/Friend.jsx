@@ -18,7 +18,6 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const { _id } = useSelector((state) => state.user); // destruct the id from the current login user
   const token = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends); // take a look of user schema for better understanding // here we grab the current login user friends list
-  const BackendUrl = useSelector((state) => state.BackendUrl);
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
   const primaryDark = palette.primary.dark;
@@ -32,13 +31,16 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
 
   /*  ---------------------> addRemoveFriend <-----------------------*/
   const patchFriend = async () => {
-    const response = await fetch(`${BackendUrl}/users/${_id}/${friendId}`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_Backend_URL}/users/${_id}/${friendId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const data = await response.json();
     dispatch(setFriends({ friends: data }));
   };
@@ -48,7 +50,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   // and update the profile view Count
   const handleClick = async () => {
     const response = await fetch(
-      `${BackendUrl}/users/profileview/${_id}/${friendId}`,
+      `${process.env.REACT_APP_Backend_URL}/users/profileview/${_id}/${friendId}`,
       {
         method: "GET",
         headers: {

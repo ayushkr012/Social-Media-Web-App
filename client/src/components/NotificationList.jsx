@@ -24,14 +24,13 @@ const NotificationList = ({
   const mode = useSelector((state) => state.mode);
   const medium = palette.neutral.medium;
   const mediumMain = palette.neutral.mediumMain;
-  const BackendUrl = useSelector((state) => state.BackendUrl);
   const { _id } = useSelector((state) => state.user);
 
   // when user click on notification then they navigate to the Crossponding user profile page
   const handleClick = async () => {
     //  we update the notification read status to true
     const response = await fetch(
-      `${BackendUrl}/users/updateNotificationStatus/${_id}/${friendId}`,
+      `${process.env.REACT_APP_Backend_URL}/users/updateNotificationStatus/${_id}/${friendId}`,
       {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },

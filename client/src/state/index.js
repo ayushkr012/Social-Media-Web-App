@@ -11,8 +11,6 @@ const initialState = {
   posts: [],
   chatFriend: null, // state to hold the selected chat friend
   notifications: [], // state to hold notification
-  BackendUrl: "https://social-media-web-app-o59e.onrender.com",
-  // BackendUrl: "http://localhost:3001",
 };
 
 export const authSlice = createSlice({

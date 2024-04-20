@@ -2,7 +2,6 @@ import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
 
 const UserImage = ({ image, size = "60px" }) => {
-  const BackendUrl = useSelector((state) => state.BackendUrl);
   return (
     <Box width={size} height={size}>
       <img

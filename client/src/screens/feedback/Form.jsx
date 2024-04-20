@@ -22,27 +22,28 @@ const FeedbackForm = () => {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const { firstName, lastName, email } = useSelector((state) => state.user);
   const [isloading, setisLoading] = useState(false);
-  const BackendUrl = useSelector((state) => state.BackendUrl);
   const token = useSelector((state) => state.token);
   const { palette } = useTheme();
   let navigate = useNavigate();
-  console.log(BackendUrl);
 
   const sendFeedback = async (values, onSubmitProps) => {
     setisLoading(true);
-    const responce = await fetch(`${BackendUrl}/users/feedback`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        feedback: values.feedback,
-      }),
-    });
+    const responce = await fetch(
+      `${process.env.REACT_APP_Backend_URL}/users/feedback`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          feedback: values.feedback,
+        }),
+      }
+    );
     const json = await responce.json();
     if (json.success) {
       toast.success(json.message);

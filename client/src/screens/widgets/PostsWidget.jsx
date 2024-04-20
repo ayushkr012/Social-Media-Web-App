@@ -8,11 +8,10 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts);
   const token = useSelector((state) => state.token);
-  const BackendUrl = useSelector((state) => state.BackendUrl);
 
   // get all the user post ( to show in the feed )
   const getPosts = async () => {
-    const response = await fetch(`${BackendUrl}/posts`, {
+    const response = await fetch(`${process.env.REACT_APP_Backend_URL}/posts`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -23,13 +22,16 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
   // get all the post of particular user
   const getUserPosts = async () => {
-    const response = await fetch(`${BackendUrl}/posts/${userId}/posts`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        // "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_Backend_URL}/posts/${userId}/posts`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // "Content-Type": "application/json",
+        },
+      }
+    );
     const data = await response.json();
     dispatch(setPosts({ posts: data }));
   };

@@ -14,15 +14,16 @@ const Notification = () => {
   const [activeMenuItem, setActiveMenuItem] = useState("All");
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
-  const BackendUrl = useSelector((state) => state.BackendUrl);
   const mode = useSelector((state) => state.mode);
-
   useEffect(() => {
     const getNotification = async () => {
-      const response = await fetch(`${BackendUrl}/users/notification/${_id}`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/users/notification/${_id}`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = await response.json();
       // console.log(notifications);
       dispatch(setNotifications({ notifications: data.updatedNotifications }));
@@ -71,7 +72,7 @@ const Notification = () => {
       <Navbar />
       <Box
         width="100%"
-        padding="2rem 13%"
+        padding={isNonMobileScreens ? "2rem 13%" : "2rem 2%"}
         display={isNonMobileScreens ? "flex" : "block"}
         gap="2rem"
         justifyContent="center"
