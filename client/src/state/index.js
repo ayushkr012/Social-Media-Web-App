@@ -11,6 +11,7 @@ const initialState = {
   posts: [],
   chatFriend: null, // state to hold the selected chat friend
   notifications: [], // state to hold notification
+  // BackendUrl: "http://localhost:3001",
 };
 
 export const authSlice = createSlice({
@@ -85,7 +86,10 @@ export const {
 
 export const setConversation = async (data) => {
   try {
-    await axios.post(`${initialState.BackendUrl}/conversation/add`, data);
+    await axios.post(
+      `${process.env.REACT_APP_Backend_URL}/conversation/add`,
+      data
+    );
   } catch (error) {
     console.log(
       " Error while connecting for conversation b/w user and account ",
@@ -97,7 +101,7 @@ export const setConversation = async (data) => {
 export const getConversation = async (data) => {
   try {
     let response = await axios.post(
-      `${initialState.BackendUrl}/conversation/get`,
+      `${process.env.REACT_APP_Backend_URL}/conversation/get`,
       data
     );
     console.log(response.data);
@@ -112,7 +116,7 @@ export const getConversation = async (data) => {
 
 export const newMessage = async (data) => {
   try {
-    await axios.post(`${initialState.BackendUrl}/message/add`, data);
+    await axios.post(`${process.env.REACT_APP_Backend_URL}/message/add`, data);
   } catch (error) {
     console.log(" Error while calling newmessage api ", error.message);
   }
@@ -121,7 +125,7 @@ export const newMessage = async (data) => {
 export const getMsgs = async (id) => {
   try {
     let response = await axios.get(
-      `${initialState.BackendUrl}/message/get/${id}`
+      `${process.env.REACT_APP_Backend_URL}/message/get/${id}`
     );
     console.log(response.data);
     return response.data;
