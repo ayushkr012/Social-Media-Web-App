@@ -7,12 +7,14 @@ Connectify is a comprehensive social networking platform where users have comple
 ## Features
 
 - **CRUD Operations**: Users can create, read, update, and delete their posts.
-- **Post Upload**: Users can upload posts to share content with the community.
+- **Post Upload**: Users can upload posts such as text/image/video to share content with the community.
+- **Chat feature** Integrated real-time chat functionality using Socket.io, enabling seamless communication among users.
+- **Push Notifications**: Enhanced user experience with push notifications for post engagement and profile activity and have personalized feeds.
 - **Post Interaction**: Users can interact with posts by liking, commenting, and connecting with other users.
 - **Post Sharing**: Users can share posts on various platforms including WhatsApp, LinkedIn, Telegram, and Twitter.
 - **Profile Viewing**: Users can view their own and their friends' profiles to stay connected.
-- **Timely Notifications**: Users receive notifications for post likes, profile views, and comments to stay engaged.
-- **Secure Access Measures**: OTP-based login and JWT-based authentication ensure user data integrity and confidentiality.
+
+- **Secure Access Measures**: Implemented secure access measures such as OTP-based login and JWT authentication to ensure data confidentiality.
 
 ## Tech Stack
 
@@ -30,22 +32,21 @@ To get started with Connectify, follow these steps:
 4. Create a `.env` file in the server directory.
 5. Add the following environment variables to the `.env` file:
 
-    ```
-    MONGO_URI=<your-mongo-uri>
-    PORT=3001
-    JWT_SECRET="<your-jwt-secret>"
-    EMAIL=<your-email>
-    PASSWORD=<your-password>
-    ```
+   ```
+   MONGO_URI=<your-mongo-uri>
+   PORT=3001
+   JWT_SECRET="<your-jwt-secret>"
+   EMAIL=<your-email>
+   PASSWORD=<your-password>
+   ```
 
-    Replace `<your-mongo-uri>` with your MongoDB URI, `<your-jwt-secret>` with your JWT secret, `<your-email>` with your email, and `<your-password>` with your password.
+   Replace `<your-mongo-uri>` with your MongoDB URI, `<your-jwt-secret>` with your JWT secret, `<your-email>` with your email, and `<your-password>` with your password.
 
 6. Navigate back to the project root directory: `cd ..`
 7. Install dependencies: `npm install`
 8. Start the development server: `npm start`
 
 Now, you can access Connectify at `http://localhost:3001`.
-
 
 ## How to Contribute
 
