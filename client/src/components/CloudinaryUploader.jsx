@@ -1,10 +1,6 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
+/* generate the time stamp and signature for the images and videos   */
 
 const CloudinaryUploader = () => {
-  const [timestamp, setTimestamp] = useState(null);
-  const [signature, setSignature] = useState(null);
-  
   const uploadFile = async (file, type, timestamp, signature) => {
     const folder = type === "image" ? "images" : "videos";
 
@@ -35,13 +31,16 @@ const CloudinaryUploader = () => {
 
   const getSignatureForUpload = async (folder) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_Backend_URL}/uploadfile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ folder }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/uploadfile`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ folder }),
+        }
+      );
       const { timestamp, signature } = await res.json();
       return { timestamp, signature };
     } catch (error) {

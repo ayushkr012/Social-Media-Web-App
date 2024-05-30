@@ -1,41 +1,36 @@
 import { Box, Typography, useTheme, Divider } from "@mui/material";
 import NotificationList from "components/NotificationList";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
 
 // props data came from screens/notification/index.jsx
 const NotificationWidget = ({ userId }) => {
   const { palette } = useTheme();
   const notifications = useSelector((state) => state.notifications);
-  // console.log(notifications);
   const mode = useSelector((state) => state.mode);
 
   return (
     <WidgetWrapper
-      sx={
-        // isNonMobileScreens && {
-        {
-          maxHeight: "100vh", //"calc(100vh - 200px)", // Adjust the max height as per your design
-          overflowY: "auto", // Add vertical scrollbar
-          scrollbarWidth: "thin", // Set scrollbar width thin bold strong
-          scrollbarColor: `${palette.primary.main} ${palette.background.default}`, // Set scrollbar color
-        }
-      }
+      sx={{
+        maxHeight: "100vh", // Adjust the max height as per your design
+        overflowY: "auto", // Add vertical scrollbar
+        scrollbarWidth: "thin", // Set scrollbar width thin bold strong
+        scrollbarColor: `${palette.primary.main} ${palette.background.default}`, // Set scrollbar color
+      }}
     >
       <Box display="flex" flexDirection="column" gap="2rem">
         {Array.isArray(notifications) &&
           notifications.map((user, index) => (
             <Box
+              key={`${user.userId}_${index}`} // Move the key prop here
               sx={{
                 "&:hover": {
-                  backgroundColor: mode == "dark" ? "#333333" : "#EBEBEA",
+                  backgroundColor: mode === "dark" ? "#333333" : "#EBEBEA",
                   cursor: "pointer",
                 },
               }}
             >
               <NotificationList // it is component : path client/src/components/NotificationList.jsx
-                key={`${user.userId}_${index}`}
                 friendId={user.userId}
                 name={`${user.firstName} ${user.lastName}`}
                 subtitle={user.occupation}
@@ -47,7 +42,7 @@ const NotificationWidget = ({ userId }) => {
               <Divider
                 sx={{
                   color:
-                    mode == "dark"
+                    mode === "dark"
                       ? `${palette.primary.main} ${palette.background.default}`
                       : "light",
                 }}
