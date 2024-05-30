@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 const CloudinaryUploader = () => {
   const [timestamp, setTimestamp] = useState(null);
   const [signature, setSignature] = useState(null);
+  
   const uploadFile = async (file, type, timestamp, signature) => {
     const folder = type === "image" ? "images" : "videos";
 

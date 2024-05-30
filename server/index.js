@@ -48,28 +48,6 @@ connectDB();
 /* Cloudinary Configuration when user upload image or videos */
 app.post("/uploadfile", generateSignature);
 
-/*Update Post */
-// app.put(
-//   "/posts/:postId/editPost",
-//   verifyToken,
-//   upload.single("picture"), // Attach upload middleware directly to the route
-//   (req, res, next) => {
-//     // Check if picture exists in request file
-//     if (req.file) {
-//       // If picture exists, execute uploadImage middleware
-//       uploadImage(req, res, (err) => {
-//         if (err) {
-//           return res.status(400).json({ error: "Failed to upload picture." });
-//         }
-//         next(); // Move to the next middleware
-//       });
-//     } else {
-//       next(); // Move to the next middleware directly
-//     }
-//   },
-//   updatePost
-// );
-
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
@@ -80,10 +58,16 @@ app.use("/conversation", conversation);
 /* SOCKET.IO Part */
 const server = http.createServer(app); // Assuming `app` is your Express application
 
+// const io = new Server(server, {
+//   cors: {
+//     // origin: "http://localhost:3000",
+//     // origin: "https://social-media-web-app-mu.vercel.app",
+//   },
+// });
+
 const io = new Server(server, {
   cors: {
-    // origin: "http://localhost:3000",
-    origin: "https://social-media-web-app-mu.vercel.app",
+    origin: "*", // Allow all origins
   },
 });
 
