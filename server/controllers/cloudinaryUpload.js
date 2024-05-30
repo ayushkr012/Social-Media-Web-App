@@ -1,4 +1,8 @@
 import { v2 as cloudinary } from "cloudinary";
+import dotenv from "dotenv";
+
+// Load environment variables from .env file
+dotenv.config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -11,10 +15,7 @@ export const generateSignature = (req, res, next) => {
   const { folder } = req.body;
 
   if (!folder) {
-    res.status(400);
-    // return next(new Error("folder name is required"));
-    console.log("folder name is required");
-    return res.status(400).json({ message: "folder name is required" });
+    return res.status(400).json({ message: "Folder name is required" });
   }
 
   try {
@@ -30,7 +31,7 @@ export const generateSignature = (req, res, next) => {
 
     res.status(200).json({ timestamp, signature });
   } catch (error) {
-    console.log(error);
+    console.error("Error generating signature:", error);
     res.status(500);
     next(error);
   }
