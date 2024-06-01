@@ -210,6 +210,48 @@ const Form = () => {
     }
   };
 
+  // this is for the demo purpose only
+  const demo = async () => {
+    try {
+      setIsSubmitting(true);
+      const response = await fetch(
+        `${process.env.REACT_APP_Backend_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: "ayushkr7780@gmail.com",
+            password: "123456",
+          }),
+        }
+      );
+      const json = await response.json();
+      if (json.success) {
+        dispatch(
+          setLogin({
+            // when we have to pass as a payload we use an object and pass the data as a key value pair
+            user: json.user,
+            token: json.token,
+          })
+        );
+        toast.success(json.message);
+        setIsSubmitting(false);
+        navigate("/home");
+      } else {
+        toast.error(json.message);
+        setIsSubmitting(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error(err);
+      setIsSubmitting(false);
+    }
+  };
+
+  // login function after click on the login button it will call this function
+
   const login = async (values, onSubmitProps) => {
     setIsSubmitting(true);
     const loggedInResponse = await fetch(
@@ -233,10 +275,6 @@ const Form = () => {
       toast.success(json.message);
       setIsSubmitting(false);
       navigate("/home");
-      // setTimeout(() => {
-      //   navigate("/home");
-      //   setIsSubmitting(false);
-      // }, 10000);
     } else {
       toast.error(json.message);
       setIsSubmitting(false);
@@ -545,7 +583,9 @@ const Form = () => {
                   >
                     Sign Up here.
                   </Typography>
+                  <Button onClick={demo}> DEMO</Button>
                 </FlexBetween>
+
                 {isLogin && (
                   <Button onClick={handleOtpLogin}>Login with OTP</Button>
                 )}
