@@ -76,10 +76,13 @@ const PostWidget = ({
   const loggedInUserId = useSelector((state) => state.user?._id);
   // console.log("Likes:", Object.keys(likes).length);
 
-  const isLiked = loggedInUserId ? Boolean(likes[loggedInUserId]) : false;
-
-  // console.log("isLiked:", isLiked);
-  const likeCount = Object.keys(likes).length;
+  // Ensure likes is defined and an object before accessing its properties
+  const isLiked =
+    loggedInUserId && likes && typeof likes === "object"
+      ? Boolean(likes[loggedInUserId])
+      : false;
+  const likeCount =
+    likes && typeof likes === "object" ? Object.keys(likes).length : 0;
 
   const main = palette?.neutral?.main;
   const primary = palette?.primary?.main;

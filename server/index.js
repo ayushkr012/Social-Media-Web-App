@@ -56,7 +56,7 @@ app.use("/message", msg);
 app.use("/conversation", conversation);
 
 /* SOCKET.IO Part */
-const server = http.createServer(app); // Assuming `app` is your Express application
+const server = http.createServer(app);
 
 // const io = new Server(server, {
 //   cors: {
@@ -81,7 +81,6 @@ io.on("connection", (socket) => {
 
 io.on("connection", (socket) => {
   console.log("A client connected");
-  // Your socket connection handling logic here
 
   let users = [];
 
