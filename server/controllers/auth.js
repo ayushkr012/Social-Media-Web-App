@@ -3,6 +3,9 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import UserOtp from "../models/UserOtp.js";
 import nodemailer from "nodemailer";
+import OAtuh2Client from "google-auth-library";
+
+const client = new OAtuh2Client.OAuth2Client(process.env.Google_Client_Id);
 
 /* Register a New User */
 export const register = async (req, res) => {
@@ -383,6 +386,70 @@ export const verifyOtp = async (req, res) => {
       success: false,
       error: err.message,
       message: "Internal Server Error",
+    });
+  }
+};
+
+/* Goolge Login */
+
+export const googleLogin = async (req, res) => {
+  try {
+    const { tokenId } = req.body;
+    console.log(req.body);
+
+    // Verify the token
+    const ticket = await client.verifyIdToken({
+      idToken: tokenId,
+      audience: process.env.Google_Client_Id,
+    });
+    const { email_verified, name, email, picture } = ticket.getPayload();
+
+    if (email_verified) {
+      let user = await User.findOne({ email });
+
+      const [firstName, ...lastNameArray] = name.split(" ");
+      const lastName = lastNameArray.join(" ");
+
+      if (user) {
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        user = user.toObject(); // Convert Mongoose document to plain JavaScript object
+        delete user.password; // Remove the password field
+        return res.status(200).json({
+          success: true,
+          message: "Login Successful!",
+          user,
+          token,
+        });
+      } else {
+        const newUser = new User({
+          firstName,
+          lastName,
+          email,
+          picturePath: picture,
+        });
+        const savedUser = await newUser.save();
+        const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET);
+        const userWithoutPassword = savedUser.toObject(); // Convert to plain JavaScript object
+        delete userWithoutPassword.password; // Remove the password field
+        return res.status(200).json({
+          success: true,
+          message: "Login Successful!",
+          user: userWithoutPassword,
+          token,
+        });
+      }
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Email not verified",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message,
     });
   }
 };

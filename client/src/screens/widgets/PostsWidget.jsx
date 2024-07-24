@@ -42,7 +42,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     } else {
       getPosts();
     }
-  }, []); 
+  }, []);
 
   return (
     <>
